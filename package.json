@@ -4,18 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "server": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
+    "dotenv": "^16.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
-    "json": "^9.0.6",
+    "json": "^11.0.0",
     "mongoose": "^5.7.5",
     "multer": "^1.4.2",
     "nexmo": "^2.5.1",
@@ -24,6 +26,6 @@
     "random-number": "0.0.9"
   },
   "devDependencies": {
-    "nodemon": "^1.19.4"
+    "nodemon": "^2.0.15"
   }
 }
