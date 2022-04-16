@@ -15,7 +15,7 @@ var app = express();
 /* Khai báo để sử dụng kịch bản passport */
 require('./config/passport.config');
 
-mongoose.connect(`mongodb+srv://admin:${process.env.DB_MONGO_PASSWORD}@cluster0.xaica.mongodb.net/${process.env.DB_MONGO_USERNAME}?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb+srv://${process.env.DB_MONGO_USERNAME}:${process.env.DB_MONGO_PASSWORD}@cluster0.xaica.mongodb.net/${process.env.DB_MONGO_DATABASENAME}?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false
@@ -50,7 +50,6 @@ app.use(express.static("public"));
 app.use('/nguoi-dung', userRouter);
 app.use('/phong-tro', homeRouter);
 app.use('/trang-chu', homePageRouter);
-
 
 app.listen(process.env.HEROKU_API_URL, (err) => {
   if (err) console.log(err);
