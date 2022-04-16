@@ -54,5 +54,5 @@ app.use('/trang-chu', homePageRouter);
 
 app.listen(process.env.HEROKU_API_URL, (err) => {
   if (err) console.log(err);
-  console.log("Listen port 3001");
+  console.log(`Listen port ${process.env.HEROKU_API_URL}`);
 });
