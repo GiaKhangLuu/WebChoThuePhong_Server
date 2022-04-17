@@ -12,8 +12,7 @@ var flash = require('connect-flash');
 
 require('dotenv').config();
 var app = express();
-/* Khai báo để sử dụng kịch bản passport */
-require('./config/passport.config');
+
 
 mongoose.connect(`mongodb+srv://${process.env.DB_MONGO_USERNAME}:${process.env.DB_MONGO_PASSWORD}@cluster0.xaica.mongodb.net/${process.env.DB_MONGO_DATABASENAME}?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
