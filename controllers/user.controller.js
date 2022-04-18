@@ -10,6 +10,7 @@ const argon2 = require('argon2');
 require('dotenv').config();
 var User = require('../models/User/user.model')
 var FeedBack = require('../models/User/feedback')
+const AuditLogSystem = require('../common/audit.log');
 
 //###########__Login__#####################
 module.exports.login = async (req, res) => {
@@ -69,11 +70,13 @@ module.exports.register = async (req, res) => {
                 message: messageRes.EMAIL_INCORRECT_FORMAT
             });
         }
+
         if (user)
             return res.status(400).json({
                 success: false,
                 message: messageRes.USERNAME_ALREADY_TAKEN
             });
+
         user = await User.findOne({ "local.email": email });
         if (user)
             return res.status(400).json({
@@ -82,15 +85,18 @@ module.exports.register = async (req, res) => {
             })
 
         const hashedPassword = await argon2.hash(password);
+        //create new User
         var newUser = new User();
         newUser.local.username = username;
         newUser.local.password = hashedPassword;
         newUser.local.email = email;
         newUser.infor.firstname = firstname;
         newUser.infor.lastname = lastname;
-
         await newUser.save();
 
+        //set audit log Create
+        newUser = AuditLogSystem.SetCreateInfo(newUser._id, newUser.local.username, newUser);
+        await newUser.save();
         res.json({
             success: true,
             message: messageRes.REGISTER_SUCCESSFULLY,
