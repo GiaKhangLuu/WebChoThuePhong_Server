@@ -8,8 +8,10 @@ module.exports = {
     INTERVAL_SERVER: "Lỗi không xác định",
     NEWS_NOT_FOUND: "Không tìm thấy tin đăng",
     PHONE_IS_NOT_VALID: "Số điện thoại không đúng định dạng",
+    FORBIDDEN_403: "Truy cập bị cấm",
     //RESULT SUCCESSFULLY
     REGISTER_SUCCESSFULLY: "Đăng ký thành công",
     LOGIN_SUCCESSFULLY: "Đăng nhập thành công",
     INF_SUCCESSFULLY: "Thành công",
+    UPDATE_SUCCESSFULLY: "Cập nhật thành công",
 }

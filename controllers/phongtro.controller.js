@@ -30,6 +30,7 @@ module.exports.UploadAvarta = async (req, res) => {
     try {
 
         await upload(req, res, (err) => {
+            console.log(err);
             if (err) {
                 return res.status(400).json({
                     result: false,
