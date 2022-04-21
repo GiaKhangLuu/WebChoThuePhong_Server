@@ -6,12 +6,20 @@ const passport = require("passport");
 var bodyParser = require("body-parser");
 var session = require("express-session");
 
+<<<<<<< HEAD
 var userRouter = require("./routers/user.router");
 var homeRouter = require("./routers/phongtro.router");
 var homePageRouter = require("./routers/home.router");
 var adminNewRouter = require('./routers/Admin/admin.new.router')
 
 var flash = require("connect-flash");
+=======
+var userRouter = require('./routers/user.router');
+var homeRouter = require('./routers/phongtro.router');
+var homePageRouter = require('./routers/home.router');
+const cors = require('cors');
+var flash = require('connect-flash');
+>>>>>>> ff981512bc5f72fb367d56533a649ed587a8f76f
 
 require("dotenv").config();
 var app = express();
@@ -50,7 +58,7 @@ app.use([
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(cors());
 app.use(express.static("public"));
 
 app.use("/nguoi-dung", userRouter);
@@ -58,9 +66,11 @@ app.use("/phong-tro", homeRouter);
 app.use("/trang-chu", homePageRouter);
 app.use("/admin", adminNewRouter)
 
-app.listen(process.env.HEROKU_API_URL, (err) => {
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, (err) => {
   if (err) console.log(err);
-  console.log(`Listen port ${process.env.HEROKU_API_URL}`);
+  console.log(`Listen port ${PORT}`);
 });
 
 
