@@ -17,7 +17,7 @@ module.exports.GetAllNews = async (req, res) => {
 
 //############ Get detail news ##############
 module.exports.GetDetailById = async (req, res) => {
-  let news = await News.findOne({ "_id": req.params._id });
+  let news = await News.findOne({ "_id": req.params.id });
   if (news == null) {
     return res.status(404).json({
       success: false,
