@@ -42,10 +42,8 @@ app.use(
 );
 
 app.use([
-  bodyParser.json(),
-  bodyParser.urlencoded({
-    extended: true,
-  }),
+  bodyParser.json({ limit: '50mb' }),
+  bodyParser.urlencoded({ limit: '50mb', extended: true }),
 ]);
 app.use(flash());
 app.use(passport.initialize());
