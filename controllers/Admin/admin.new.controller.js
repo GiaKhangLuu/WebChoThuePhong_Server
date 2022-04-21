@@ -36,10 +36,13 @@ module.exports.GetPendingNews = async (req, res) => {
   let news = await News.find({
     'infor.status_news': 'Chờ gửi duyệt'
   }).exec()
+
+
+
   res.json({
     success: true,
     message: messageRes.INF_SUCCESSFULLY,
-    news: news
+    news: { news, image_avatar, image_info }
   })
 }
 

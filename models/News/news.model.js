@@ -100,11 +100,11 @@ function NewsSchema(add) {
                 }
             },
             img_avatar: {
-                type: Buffer,
+                type: String,
                 required: true,
             },
             img_infor: [{
-                type: Buffer,
+                type: String,
                 required: true,
             }],
             address: {
