@@ -12,11 +12,17 @@ function authorize(roles = []) {
         (req, res, next) => {
             const authHeader = req.header('Authorization');
             const token = authHeader && authHeader.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
             if (!token) {
                 return res.status(401).json({
                     success: false,
                     message: "Access token not found"
+                });
+            }
+            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            if (!decoded) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid token"
                 });
             }
             if (roles.length && !roles.includes(decoded.Role)) {

@@ -1,7 +1,8 @@
 var express = require("express")
 var router = express.Router()
 var controller = require('../controllers/user.controller')
-
+var authorize = require('../midleware/verify.token');
+var role = require('../common/role');
 
 //################__Login___####################
 router.post("/dang-nhap", controller.login);
@@ -12,7 +13,7 @@ router.post("/dang-ky", controller.register);
 
 
 
-router.get("/thong-tin", controller.getInforUser);
+router.get("/thong-tin", authorize([role.CHUNHATRO, role.MEMBER]), controller.getInforUser);
 router.post("/xac-thuc/so-dien-thoai", controller.accuracyPhone_NB);
 router.post("/xac-thuc/so-dien-thoai/ma-OTP", controller.accuracyPhone_NB_key_OTP);
 

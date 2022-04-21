@@ -128,21 +128,31 @@ module.exports.logout = (req, res) => {
     }
 };
 //
-module.exports.getInforUser = (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({
-            result: true,
-            username: req.user.local.username,
-            role: req.user.role,
-            number_phone: req.user.number_phone,
-            img_avatar: req.user.infor.img_avatar
-        });
-    } else {
-        res.json({
-            message: "Bạn không có quyền này",
-            result: false
-        });
-    }
+module.exports.getInforUser = async (req, res) => {
+
+    var token = decoded(req)
+    await User.findOne({ "_id": token.UserId }, (err, user) => {
+        if (err) {
+            return res.json({
+                success: false,
+                message: messageRes.USERNAME_NOT_FOUND,
+                data: null
+            })
+        };
+        let namerole = "Không xác định"
+        if (user.role === "MEMBER") {
+            namerole = "THÀNH VIÊN"
+        }
+        if (user.role === "CHUNHATRO") {
+            namerole = "CHỦ NHÀ TRỌ"
+        }
+        user.local.password = "**********";
+        return res.json({
+            success: true,
+            message: messageRes.INF_SUCCESSFULLY,
+            data: user
+        })
+    })
 };
 //  Accuracy(Xác thực) send OTP Phone Number
 
@@ -431,3 +441,8 @@ var isValidEmail = function (email) {
     return email.match(pattern);
 }
 
+var decoded = function (req) {
+    const authHeader = req.header('Authorization');
+    const token = authHeader && authHeader.split(' ')[1];
+    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+}
