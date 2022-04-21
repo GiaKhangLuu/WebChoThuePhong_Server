@@ -183,7 +183,7 @@ module.exports.PostNews = async (req, res) => {
     news.utilities.isChecked_television = utilities.isChecked_parking;
     //Address
     news.address.city = city;
-    news.address.dictrict = dictrict;
+    news.address.district = district;
     news.address.street = street;
     news.address.address_detail = address_detail;
 
