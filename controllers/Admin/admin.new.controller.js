@@ -17,12 +17,12 @@ module.exports.GetAllNews = async (req, res) => {
 
 //############ Get detail news ##############
 module.exports.GetDetailById = async (req, res) => {
-  let news = await News.findOne({ "_id": req.body._id });
+  let news = await News.findOne({ "_id": req.params._id });
   if (news == null) {
     return res.status(404).json({
       success: false,
       message: messageRes.NEWS_NOT_FOUND,
-      data: req.body._id
+      data: req.params._id
     })
   }
   return res.status(200).json({

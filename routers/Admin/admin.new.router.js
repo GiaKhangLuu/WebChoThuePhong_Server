@@ -8,7 +8,7 @@ var role = require('../../common/role');
 
 router.get("/tin-tuc", authorize(role.ADMIN), controller.GetAllNews);
 router.get("/cho-gui-duyet-tin-tuc", authorize(role.ADMIN), controller.GetPendingNews)
-router.get("/chi-tiet-tin-tuc", authorize(role.ADMIN), controller.GetDetailById);
+router.post("/chi-tiet-tin-tuc/:id", authorize(role.ADMIN), controller.GetDetailById);
 router.post("/chap-nhan-tin-tuc", authorize(role.ADMIN), controller.AcceptNews)
 router.post("/tu-choi-tin-tuc", authorize(role.ADMIN), controller.DenyNews)
 
