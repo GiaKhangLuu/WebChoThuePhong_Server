@@ -9,6 +9,7 @@ var session = require("express-session");
 var userRouter = require("./routers/user.router");
 var homeRouter = require("./routers/phongtro.router");
 var homePageRouter = require("./routers/home.router");
+var adminNewRouter = require('./routers/Admin/admin.new.router')
 
 var flash = require("connect-flash");
 
@@ -55,8 +56,11 @@ app.use(express.static("public"));
 app.use("/nguoi-dung", userRouter);
 app.use("/phong-tro", homeRouter);
 app.use("/trang-chu", homePageRouter);
+app.use("/admin", adminNewRouter)
 
 app.listen(process.env.HEROKU_API_URL, (err) => {
   if (err) console.log(err);
   console.log(`Listen port ${process.env.HEROKU_API_URL}`);
 });
+
+
