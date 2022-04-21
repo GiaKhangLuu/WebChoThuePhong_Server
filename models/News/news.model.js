@@ -100,13 +100,14 @@ function NewsSchema(add) {
                 }
             },
             img_avatar: {
-                type: String,
-                required: true
+                type: Buffer,
+                required: true,
+                image: Buffer
             },
-            img_infor: {
-                type: Object,
-                required: true
-            },
+            img_infor: [{
+                type: Buffer,
+                required: true,
+            }],
             address: {
                 city: {
                     type: String,
