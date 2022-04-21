@@ -102,7 +102,6 @@ function NewsSchema(add) {
             img_avatar: {
                 type: Buffer,
                 required: true,
-                image: Buffer
             },
             img_infor: [{
                 type: Buffer,
