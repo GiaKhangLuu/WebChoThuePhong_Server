@@ -66,7 +66,7 @@ module.exports.register = async (req, res) => {
     try {
         var user = await User.findOne({ "local.username": username });
         //Check for existing user
-        if (!isEmailValid(email)) {
+        if (!isValidEmail(email)) {
             return res.status(400).json({
                 success: false,
                 message: messageRes.EMAIL_INCORRECT_FORMAT
