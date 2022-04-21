@@ -139,12 +139,11 @@ module.exports.getInforUser = async (req, res) => {
                 data: null
             })
         };
-        let namerole = "Không xác định"
         if (user.role === "MEMBER") {
-            namerole = "THÀNH VIÊN"
+            user.role = "THÀNH VIÊN"
         }
         if (user.role === "CHUNHATRO") {
-            namerole = "CHỦ NHÀ TRỌ"
+            user.role = "CHỦ NHÀ TRỌ"
         }
         user.local.password = "**********";
         return res.json({
