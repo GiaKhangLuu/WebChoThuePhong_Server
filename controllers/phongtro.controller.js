@@ -190,7 +190,12 @@ module.exports.PostNews = async (req, res) => {
 
     news = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, news);
     news.save((err) => {
-        if (err) console.log(err);
+        if (err) {
+            res.status(400).json({
+                message: "Đăng tin thất bại",
+                result: true
+            });
+        };
         res.json({
             message: "Đăng tin thành công",
             result: true
