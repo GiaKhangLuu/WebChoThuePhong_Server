@@ -50,7 +50,9 @@ app.use('/nguoi-dung', userRouter);
 app.use('/phong-tro', homeRouter);
 app.use('/trang-chu', homePageRouter);
 
-app.listen(process.env.HEROKU_API_URL, (err) => {
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, (err) => {
   if (err) console.log(err);
-  console.log(`Listen port ${process.env.HEROKU_API_URL}`);
+  console.log(`Listen port ${PORT}`);
 });
