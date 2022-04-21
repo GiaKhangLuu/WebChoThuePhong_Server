@@ -50,7 +50,15 @@ app.use('/nguoi-dung', userRouter);
 app.use('/phong-tro', homeRouter);
 app.use('/trang-chu', homePageRouter);
 
+<<<<<<< HEAD
 app.listen(3001, (err) => {
   if (err) console.log(err);
   console.log(`Listen port 3001`);
+=======
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, (err) => {
+  if (err) console.log(err);
+  console.log(`Listen port ${PORT}`);
+>>>>>>> 3bec9bd9985760f3f20d7e6355598e4ce04baf9a
 });
