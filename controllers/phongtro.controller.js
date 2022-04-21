@@ -134,7 +134,7 @@ module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
 
     let { title, content_infor, number_phone, price, acreage, img_avatar, img_infor,
-        city, dictrict, street, nb_bedroom, nb_bath_toilet,
+        city, district, street, nb_bedroom, nb_bath_toilet,
         nb_kitchenroom, utilities, typehome, address_detail } = req.body;
 
     var user = await User.findOne({ _id: token.UserId });

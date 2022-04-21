@@ -112,7 +112,7 @@ function NewsSchema(add) {
                     type: String,
                     required: true
                 },
-                dictrict: {
+                district: {
                     type: String,
                     required: true
                 },
