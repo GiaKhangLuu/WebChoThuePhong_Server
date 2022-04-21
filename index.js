@@ -7,7 +7,7 @@ var session = require('express-session');
 var userRouter = require('./routers/user.router');
 var homeRouter = require('./routers/phongtro.router');
 var homePageRouter = require('./routers/home.router');
-
+const cors = require('cors');
 var flash = require('connect-flash');
 
 require('dotenv').config();
@@ -42,7 +42,7 @@ app.use([
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(cors());
 app.use(express.static("public"));
 
 
