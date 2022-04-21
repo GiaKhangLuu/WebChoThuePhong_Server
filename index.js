@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 var express = require("express");
 const mongoose = require('mongoose');
 const passport= require('passport')
@@ -10,12 +12,12 @@ var homePageRouter= require('./routers/home.router');
 
 var flash = require('connect-flash');
 
-
-
 var app = express();
+const URI = process.env.CLOUD_DB_URI
+
 /* Khai báo để sử dụng kịch bản passport */
 require('./config/passport.config');
-mongoose.connect('mongodb://localhost/Database_PhongTroVN', {
+mongoose.connect(URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false
