@@ -33,13 +33,14 @@ module.exports.login = async (req, res) => {
 
             });
         //Correct
+        console.log(user.role);
         const accessToken = jwt.sign(
-            { UserId: user._id, UserName: user.local.username },
+            { UserId: user._id, UserName: user.local.username, Role: user.role },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "10h" }
         );
         const refreshToken = jwt.sign(
-            { UserId: user._id, UserName: user.local.username },
+            { UserId: user._id, UserName: user.local.username, Role: user.role },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "7d" }
         );
@@ -60,11 +61,12 @@ module.exports.login = async (req, res) => {
 
 //###########__Register__###################
 module.exports.register = async (req, res) => {
-    const { username, password, email, firstname, lastname } = req.body;
+    const { username, password, email, firstname, lastname, gender } = req.body;
+
     try {
         var user = await User.findOne({ "local.username": username });
         //Check for existing user
-        if (!isEmailValid(email)) {
+        if (!isValidEmail(email)) {
             return res.status(400).json({
                 success: false,
                 message: messageRes.EMAIL_INCORRECT_FORMAT
@@ -86,12 +88,19 @@ module.exports.register = async (req, res) => {
 
         const hashedPassword = await argon2.hash(password);
         //create new User
-        var newUser = new User();
-        newUser.local.username = username;
-        newUser.local.password = hashedPassword;
-        newUser.local.email = email;
-        newUser.infor.firstname = firstname;
-        newUser.infor.lastname = lastname;
+        var newUser = new User({
+            "local.username": username,
+            "local.password": hashedPassword,
+            "local.email": email,
+            "infor.firstname": firstname,
+            "infor.lastname": lastname,
+            "infor.gender": gender
+        });
+
+        if (newUser.infor.gender) {
+            newUser.infor.img_avatar = process.env.URL_IMAGE_FEMALE
+        } else newUser.infor.img_avatar = process.env.URL_IMAGE_MALE
+
         await newUser.save();
 
         //set audit log Create
@@ -103,33 +112,11 @@ module.exports.register = async (req, res) => {
             data: newUser._id
         })
     } catch (error) {
+        console.log(error);
         res.status(500).json({ success: false, message: messageRes.INTERVAL_SERVER })
     }
 };
-var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
 
-function isEmailValid(email) {
-    if (!email)
-        return false;
-
-    if (email.length > 254)
-        return false;
-
-    var valid = emailRegex.test(email);
-    if (!valid)
-        return false;
-
-    // Further checking of some things regex can't handle
-    var parts = email.split("@");
-    if (parts[0].length > 64)
-        return false;
-
-    var domainParts = parts[1].split(".");
-    if (domainParts.some(function (part) { return part.length > 63; }))
-        return false;
-
-    return true;
-}
 // get infor user login
 module.exports.logout = (req, res) => {
     if (req.isAuthenticated()) {
@@ -146,21 +133,30 @@ module.exports.logout = (req, res) => {
     }
 };
 //
-module.exports.getInforUser = (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({
-            result: true,
-            username: req.user.local.username,
-            role: req.user.role,
-            number_phone: req.user.number_phone,
-            img_avatar: req.user.infor.img_avatar
-        });
-    } else {
-        res.json({
-            message: "Bạn không có quyền này",
-            result: false
-        });
-    }
+module.exports.getInforUser = async (req, res) => {
+
+    var token = decoded(req)
+    await User.findOne({ "_id": token.UserId }, (err, user) => {
+        if (err) {
+            return res.json({
+                success: false,
+                message: messageRes.USERNAME_NOT_FOUND,
+                data: null
+            })
+        };
+        if (user.role === "MEMBER") {
+            user.role = "THÀNH VIÊN"
+        }
+        if (user.role === "CHUNHATRO") {
+            user.role = "CHỦ NHÀ TRỌ"
+        }
+        user.local.password = "**********";
+        return res.json({
+            success: true,
+            message: messageRes.INF_SUCCESSFULLY,
+            data: user
+        })
+    })
 };
 //  Accuracy(Xác thực) send OTP Phone Number
 
@@ -444,3 +440,13 @@ module.exports.EditedInforUser = async (req, res) => {
     }
 }
 
+var isValidEmail = function (email) {
+    const pattern = "^(\\s+)?\\w+([-+.']\\w+)*@[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*\\.[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*(\\s+)?$";
+    return email.match(pattern);
+}
+
+var decoded = function (req) {
+    const authHeader = req.header('Authorization');
+    const token = authHeader && authHeader.split(' ')[1];
+    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+}

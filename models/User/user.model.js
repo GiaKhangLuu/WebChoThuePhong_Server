@@ -13,15 +13,8 @@ function UserSchema(add) {
                     type: String,
                     required: true
                 },
-                male_female: {
-                    male: {
-                        type: Boolean,
-                        default: true
-                    },
-                    female: {
-                        type: Boolean,
-                        default: false
-                    }
+                gender: {
+                    type: Boolean
                 },
                 img_avatar: {
                     type: String,

@@ -1,25 +1,23 @@
-class AudiLogSystem {
 
-    SetFullInfo(userId, userName, model) {
-        SetCreateInfo(userId, userName, model);
-        SetUpdateInfo(userId, userName, model);
-    }
+module.exports.SetCreateInfo = (userId, userName, model) => {
+    model.createtime = Date.now();
+    model.createbyid = userId;
+    model.createbyname = userName;
 
-    SetCreateInfo(userId, userName, model) {
-        model.createtime = Date.now();
-        model.createbyid = userId;
-        model.createbyname = userName;
-        console.log(model);
-        return model;
-    }
-    SetUpdateInfo(userId, userName, model) {
-
-        model.updatetime = Date.now();
-        model.updatebyid = userId;
-        model.updatebyname = userName;
-
-        return model;
-    }
+    return model;
 }
 
-module.exports = new AudiLogSystem();
+module.exports.SetUpdateInfo = (userId, userName, model) => {
+
+    model.updatetime = Date.now();
+    model.updatebyid = userId;
+    model.updatebyname = userName;
+
+    return model;
+}
+
+module.exports.SetFullInfo = (userId, userName, model) => {
+    model = this.SetCreateInfo(userId, userName, model);
+    model = this.SetUpdateInfo(userId, userName, model);
+    return model;
+}
