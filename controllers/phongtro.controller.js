@@ -31,21 +31,19 @@ module.exports.UploadAvarta = async (req, res) => {
 
         await upload(req, res, (err) => {
             if (err) {
-                res.json({
+                return res.status(400).json({
                     result: false,
                     message_err: "Không thể upload Ảnh"
                 })
             };
             res.setHeader('Content-Type', 'image/jpeg');
-            res.json({
-
+            return res.status(200).json({
                 result: true,
                 filename_avatar: req.file.filename
             });
         });
     } catch (err) {
-        res.json({
-
+        return res.status(400).json({
             result: false,
             message_err: "Không thể upload Ảnh"
         });
