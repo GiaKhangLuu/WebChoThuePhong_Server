@@ -40,7 +40,7 @@ app.use(
     },
   })
 );
-app.use(express.bodyParser({ limit: '50mb' }));
+
 app.use([
   bodyParser.json(),
   bodyParser.urlencoded({
@@ -52,7 +52,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
 app.use(express.static("public"));
-
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", '*');
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+  next();
+});
 app.use("/nguoi-dung", userRouter);
 app.use("/phong-tro", homeRouter);
 app.use("/trang-chu", homePageRouter);
