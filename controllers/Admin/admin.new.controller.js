@@ -32,7 +32,21 @@ module.exports.AcceptNews = async (req, res) => {
   let news_id = req.body._id
   let news = await News.findOneAndUpdate(
     { _id: news_id }, 
-    { $set: { "infor.$.status_news": "Chấp nhận" } },
+    { $set: { "infor.status_news": "Chấp nhận" } },
+    { new: true }
+  ).exec()
+  res.json({
+    news: news
+  })
+}
+
+
+//################ Deny news  ###########
+module.exports.DenyNews = async (req, res) => {
+  let news_id = req.body._id
+  let news = await News.findOneAndUpdate(
+    { _id: news_id }, 
+    { $set: { "infor.status_news": "Từ chối" } },
     { new: true }
   ).exec()
   res.json({

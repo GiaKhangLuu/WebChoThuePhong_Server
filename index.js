@@ -9,6 +9,7 @@ var session = require("express-session");
 var userRouter = require("./routers/user.router");
 var homeRouter = require("./routers/phongtro.router");
 var homePageRouter = require("./routers/home.router");
+var adminNewRouter = require("./routers/Admin/admin.new.router")
 const cors = require("cors");
 var flash = require("connect-flash");
 
