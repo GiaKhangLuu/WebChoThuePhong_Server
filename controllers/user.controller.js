@@ -61,7 +61,7 @@ module.exports.login = async (req, res) => {
 
 //###########__Register__###################
 module.exports.register = async (req, res) => {
-    const { username, password, email, firstname, lastname } = req.body;
+    const { username, password, email, firstname, lastname, gender } = req.body;
 
     try {
         var user = await User.findOne({ "local.username": username });
@@ -94,7 +94,12 @@ module.exports.register = async (req, res) => {
             "local.email": email,
             "infor.firstname": firstname,
             "infor.lastname": lastname,
+            "infor.gender": gender
         });
+
+        if (newUser.infor.gender) {
+            newUser.infor.img_avatar = process.env.URL_IMAGE_FEMALE
+        } else newUser.infor.img_avatar = process.env.URL_IMAGE_MALE
 
         await newUser.save();
 
