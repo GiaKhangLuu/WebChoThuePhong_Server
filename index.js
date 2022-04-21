@@ -40,7 +40,7 @@ app.use(
     },
   })
 );
-
+app.use(express.bodyParser({ limit: '50mb' }));
 app.use([
   bodyParser.json(),
   bodyParser.urlencoded({
