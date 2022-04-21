@@ -28,29 +28,21 @@ const upload = multer({
 
 module.exports.UploadAvarta = async (req, res) => {
     try {
-        if (req.isAuthenticated() && 'CHUNHATRO' == req.user.role) {
 
-            await upload(req, res, (err) => {
-                if (err) {
-                    res.json({
-                        result: false,
-                        message_err: "Không thể upload Ảnh"
-                    })
-                };
-                res.setHeader('Content-Type', 'image/jpeg');
+        await upload(req, res, (err) => {
+            if (err) {
                 res.json({
-
-                    result: true,
-                    filename_avatar: req.file.filename
-                });
-            });
-        } else {
+                    result: false,
+                    message_err: "Không thể upload Ảnh"
+                })
+            };
             res.setHeader('Content-Type', 'image/jpeg');
             res.json({
-                message: "Bạn không có quyền này",
-                result: false
+
+                result: true,
+                filename_avatar: req.file.filename
             });
-        }
+        });
     } catch (err) {
         res.json({
 
@@ -103,50 +95,39 @@ const upload_multipble = multer({
 }).array("files", 10);
 
 module.exports.UploadImageInfor = async (req, res) => {
-    if (req.isAuthenticated() && 'CHUNHATRO' == req.user.role) {
-        let arrayimagename = [];
-        await upload_multipble(req, res, (err) => {
-            if (err) {
-                res.json({
-                    result: false,
-                    message_err: "Lỗi không thể upload các ảnh"
-                });
-            }
-            req.files.map(item => {
-                arrayimagename.push(item.filename);
-            })
+
+    let arrayimagename = [];
+    await upload_multipble(req, res, (err) => {
+        if (err) {
             res.json({
-                arrayimagenames: arrayimagename,
-                result: true
+                result: false,
+                message_err: "Lỗi không thể upload các ảnh"
             });
-        });
-    } else {
+        }
+        req.files.map(item => {
+            arrayimagename.push(item.filename);
+        })
         res.json({
-            message: "Bạn không có quyền này",
-            result: false
+            arrayimagenames: arrayimagename,
+            result: true
         });
-    }
+    });
 
 }
 
 module.exports.DeleteImageInfor = async (req, res) => {
-    if (req.isAuthenticated() && 'CHUNHATRO' == req.user.role) {
-        let imagename = "public/uploads/" + req.body.filename_imageinfor;
-        await fs.unlink(imagename, (err) => {
-            if (err) res.json({
-                result: false,
-                message_err: "Lỗi không thể xóa ảnh"
-            });
-            res.json({
-                result: true
-            })
-        })
-    } else {
-        res.json({
-            message: "Bạn không có quyền này",
-            result: false
+
+    let imagename = "public/uploads/" + req.body.filename_imageinfor;
+    await fs.unlink(imagename, (err) => {
+        if (err) res.json({
+            result: false,
+            message_err: "Lỗi không thể xóa ảnh"
         });
-    }
+        res.json({
+            result: true
+        })
+    })
+
 }
 
 // Căn hộ
