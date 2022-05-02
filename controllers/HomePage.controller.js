@@ -1,10 +1,11 @@
 
 var News = require('../models/News/news.model');
-
+var MessageRes = require('../common/message.res');
+var StatusNews = require('../common/status.news');
 
 module.exports.News_All = async (req, res) => {
     try {
-        await News.find({ "infor.state_news": 1 }).sort({ "infor.date_now": -1 }).limit(6).exec(
+        await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(6).exec(
             (err, result) => {
                 if (err) console.log(err);
                 res.json({
@@ -19,7 +20,24 @@ module.exports.News_All = async (req, res) => {
     }
 }
 
-
+module.exports.News_Special = async (req, res) => {
+    try {
+        await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, products) => {
+            if (err) return res.status(400).json({ result: false, message: err })
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: products
+            })
+        })
+    }
+    catch {
+        return res.status(500).json({
+            result: false,
+            message: MessageRes.INTERVAL_SERVER
+        })
+    }
+}
 
 module.exports.News_Detail = async (req, res) => {
     try {
@@ -87,11 +105,13 @@ module.exports.NewsNears = async (req, res) => {
 
 module.exports.News_RoomHome = async (req, res) => {
     try {
-        await News.find({ "infor.state_news": 1, "infor.typehome": 1 }).sort({ "infor.date_now": -1 }).limit(6).exec(
+        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6).exec(
             (err, result) => {
                 if (err) console.log(err);
                 res.json({
-                    NewsRoom: result
+                    result: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: result
                 })
             })
     } catch (err) {
@@ -103,11 +123,13 @@ module.exports.News_RoomHome = async (req, res) => {
 }
 module.exports.News_HouseHome = async (req, res) => {
     try {
-        await News.find({ "infor.state_news": 1, "infor.typehome": 2 }).sort({ "infor.date_now": -1 }).limit(6).exec(
+        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6).exec(
             (err, result) => {
                 if (err) console.log(err);
                 res.json({
-                    HouseHome: result
+                    result: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: result
                 })
             })
     } catch (err) {
@@ -119,11 +141,13 @@ module.exports.News_HouseHome = async (req, res) => {
 }
 module.exports.News_ApartmentHome = async (req, res) => {
     try {
-        await News.find({ "infor.state_news": 1, "infor.typehome": 3 }).sort({ "infor.date_now": -1 }).limit(6).exec(
+        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6).exec(
             (err, result) => {
                 if (err) console.log(err);
                 res.json({
-                    ApartmentHome: result
+                    result: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: result
                 })
             })
     } catch (err) {
