@@ -158,23 +158,62 @@ module.exports.News_ApartmentHome = async (req, res) => {
     }
 }
 module.exports.NewsFilter = async (req, res) => {
-    //let{code_city,code_dictrict,code_street,typehome,valuePrice,valueAcreage}
 
     try {
-        let { PriceMin, PriceMax, AcreageMin, AcreageMax } = req.body;
-        await News.find({ "infor.price": { $gte: PriceMin, $lte: PriceMax }, "infor.acreage": { $gte: AcreageMin, $lte: AcreageMax }, "infor.state_news": 1 }).exec(
+
+        var { city, district, street, typeHome, priceMin, priceMax, acreageMin, acreageMax } = req.body;
+
+        var query = {};
+        query["infor.status_news"] = StatusNews.ACCEPTED;
+
+        //filter address
+        if (city != null) {
+            query["address.city"] = city;
+        }
+
+        if (district != null) {
+            query["address.district"] = district;
+        }
+
+        if (street != null) {
+            query["address.street"] = street;
+        }
+
+        // filter loại nhà
+        if (typeHome != null) {
+            query["infor.typehome"] = typeHome;
+        }
+
+        // filter giá tiền
+        if (priceMin != null && priceMax != null) {
+            query["infor.price"] = { $gte: priceMin, $lte: priceMax };
+        }
+
+        // filter diện tích
+        if (acreageMin != null && acreageMax != null) {
+            query["infor.acreage"] = { $gte: acreageMin, $lte: acreageMax };
+        }
+
+        await News.find(query).exec(
             (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    NewsFilter: result
+                console.log(result);
+                if (err) {
+                    return res.status(400).json({
+                        result: false,
+                        message: err ? err : MessageRes.INTERVAL_SERVER
+                    })
+                }
+                return res.status(200).json({
+                    result: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: result
                 })
             })
 
     } catch (err) {
-        console.log(err);
-        res.json({
+        return res.status(500).json({
             result: false,
-            message: err
+            message: MessageRes.INTERVAL_SERVER
         })
     }
 }
