@@ -5,16 +5,29 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 var bodyParser = require("body-parser");
 var session = require("express-session");
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: '*',
+    credentials: true,
+    methods: ["GET", "POST"]
+  }
+});
 
 var userRouter = require("./routers/user.router");
 var homeRouter = require("./routers/phongtro.router");
 var homePageRouter = require("./routers/home.router");
 var adminNewRouter = require("./routers/Admin/admin.new.router")
+const handle_socketio = require("./socketio/handle_socketio")
+
+
+
 const cors = require("cors");
 var flash = require("connect-flash");
 
 require("dotenv").config();
-var app = express();
 
 mongoose.connect(
   `mongodb+srv://${process.env.DB_MONGO_USERNAME}:${process.env.DB_MONGO_PASSWORD}@cluster0.xaica.mongodb.net/${process.env.DB_MONGO_DATABASENAME}?retryWrites=true&w=majority`,
@@ -64,7 +77,28 @@ app.use("/admin", adminNewRouter);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, (err) => {
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/test_socketio.html')
+})
+
+// ======================= SocketIO ======================
+io.on('connection', async (socket) => {
+  // Set id for socket 
+  socket.on('setUpSocketID', data => {
+    handle_socketio.SetUpSocketID(socket, data)
+  })
+  
+  //socket.id = 'abc'
+  //console.log(socket.id + ' connected to socketio')
+
+
+  // Handle user send message
+  socket.on('sendMessage', data => {
+    handle_socketio.ReceiveMessage(io, data)
+  })
+})
+
+server.listen(PORT, (err) => {
   if (err) console.log(err);
   console.log(`Listen port ${PORT}`);
 });
