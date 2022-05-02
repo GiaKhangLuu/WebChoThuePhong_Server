@@ -42,6 +42,10 @@ function UserSchema(add) {
             number_phone: {
                 type: Number,
                 default: ''
+            },
+            isEmailComfirm: {
+                type: Boolean,
+                default: false
             }
         }
     );
