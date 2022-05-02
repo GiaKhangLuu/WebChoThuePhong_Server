@@ -11,7 +11,8 @@ router.get("/thong-tin-chi-tiet/city/:code_city", controller.GetNameCity);
 router.get("/thong-tin-chi-tiet/dictrict/:code_dictrict", controller.GetNameDictrict);
 router.get("/tin-tuc-gan-do/:code_city/:code_dictrict", controller.NewsNears);
 router.get("/tin-tuc-noi-bat", controller.News_Special);
-router.post("/tim-kiem/gia-tien/dien-tich", controller.NewsFilter);
+
+router.post("/tim-kiem", controller.NewsFilter);
 
 
 
