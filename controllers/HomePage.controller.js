@@ -167,20 +167,20 @@ module.exports.NewsFilter = async (req, res) => {
         query["infor.status_news"] = StatusNews.ACCEPTED;
 
         //filter address
-        if (city != null) {
+        if (city != '') {
             query["address.city"] = city;
         }
 
-        if (district != null) {
+        if (district != '') {
             query["address.district"] = district;
         }
 
-        if (street != null) {
+        if (street != '') {
             query["address.street"] = street;
         }
 
         // filter loại nhà
-        if (typeHome != null) {
+        if (typeHome != '') {
             query["infor.typehome"] = typeHome;
         }
 
