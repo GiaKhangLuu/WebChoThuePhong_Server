@@ -249,6 +249,7 @@ module.exports.ConfirmEmailNews = async (req, res) => {
     return res.status(200).json({
         success: true,
         message: messageRes.INF_SUCCESSFULLY,
+        data: user.role
     })
 };
 
