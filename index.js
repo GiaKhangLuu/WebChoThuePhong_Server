@@ -83,19 +83,26 @@ app.get('/', (req, res) => {
 
 // ======================= SocketIO ======================
 io.on('connection', async (socket) => {
-  // Set id for socket 
-  socket.on('setUpSocketID', data => {
-    handle_socketio.SetUpSocketID(socket, data)
-  })
-  
-  //socket.id = 'abc'
-  //console.log(socket.id + ' connected to socketio')
+
+    // Set up socket
+    socket.on('setUpSocket', async data=> {
+        handle_socketio.SetSocketName(socket, data)
+        console.log(`${ new Date().toLocaleTimeString() }: ${ socket.id } - ${ socket.name } has connected`);
+        await handle_socketio.JoinRooms(socket, data);
+        const sockets = await io.fetchSockets();
+       sockets.forEach(socket => {
+        console.log(socket.id + ' - ' + socket.name)
+      })
+    });
 
 
-  // Handle user send message
-  socket.on('sendMessage', data => {
-    handle_socketio.ReceiveMessage(io, data)
-  })
+
+
+
+    // Handle user send message
+    socket.on('sendMessage',async data => {
+        await handle_socketio.ReceiveMessage(io, data)
+    })
 })
 
 server.listen(PORT, (err) => {

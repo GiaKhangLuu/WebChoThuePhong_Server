@@ -42,6 +42,10 @@ function UserSchema(add) {
             number_phone: {
                 type: Number,
                 default: ''
+            },
+            socket_id: {
+                type: String,
+                default: ''
             }
         }
     );
