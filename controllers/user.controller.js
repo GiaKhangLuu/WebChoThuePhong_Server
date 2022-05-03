@@ -243,13 +243,17 @@ module.exports.ConfirmEmailNews = async (req, res) => {
         })
     }
     user.role = role.CHUNHATRO
+    var namerole = "";
+    if (user.role === "CHUNHATRO") {
+        namerole = "CHỦ NHÀ TRỌ"
+    }
     user = await AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
     await user.save();
 
     return res.status(200).json({
         success: true,
         message: messageRes.INF_SUCCESSFULLY,
-        data: user.role
+        data: namerole
     })
 };
 
