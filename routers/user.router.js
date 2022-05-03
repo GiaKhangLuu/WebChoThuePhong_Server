@@ -14,8 +14,8 @@ router.post("/tai-khoan/kich-hoat", controller.comfirmEmail);
 
 
 router.get("/thong-tin", authorize([role.CHUNHATRO, role.MEMBER]), controller.getInforUser);
-router.post("/xac-thuc/gui-email", authorize([role.MEMBER]), controller.accuracyPhone_NB);
-router.post("/xac-thuc/xac-nhan-email", authorize([role.MEMBER]), controller.accuracyPhone_NB);
+router.post("/xac-thuc/gui-email", authorize([role.MEMBER]), controller.accuracyEmail);
+router.post("/xac-thuc/xac-nhan-email", authorize([role.MEMBER]), controller.ConfirmEmailNews);
 
 
 
