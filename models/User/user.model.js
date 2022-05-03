@@ -35,6 +35,24 @@ function UserSchema(add) {
                     required: true
                 },
             },
+            address: {
+                city: {
+                    type: String,
+                    required: true
+                },
+                district: {
+                    type: String,
+                    required: true
+                },
+                street: {
+                    type: String,
+                    required: true
+                },
+                address_detail: {
+                    type: String,
+                    required: true
+                }
+            },
             role: {
                 type: String,
                 default: 'MEMBER'
