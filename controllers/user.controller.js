@@ -138,7 +138,7 @@ module.exports.getInforUser = async (req, res) => {
     var token = decoded(req)
     await User.findOne({ "_id": token.UserId }, (err, user) => {
         if (err) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: messageRes.USERNAME_NOT_FOUND,
                 data: null
@@ -158,76 +158,28 @@ module.exports.getInforUser = async (req, res) => {
         })
     })
 };
-//  Accuracy(Xác thực) send OTP Phone Number
+//  Accuracy(Xác thực) send Email
 
-var keyOTP = [];
-module.exports.accuracyPhone_NB = async (req, res) => {
-    const nexmo = new Nexmo({
-        apiKey: '686397fb',
-        apiSecret: 'dymeBDUp59WbNqzO'
-    })
+module.exports.accuracyEmail = async (req, res) => {
 
-    let { number_phone_post } = req.body;
-    if (req.isAuthenticated()) {
-        var gen = await rn.generator({
-            min: 1000
-            , max: 9999
-            , integer: true
-        });
-        var code = gen();
-        keyOTP.push(code);
-        var text = " PhongTroVN gui ma xac minh " + code + " Cam on!! ";
-        nexmo.message.sendSms(" PhongTroVN ", number_phone_post, text, (err, result) => {
-            if (err) console.log(err);
-            console.log(parseInt(number_phone_post, 10) + " ma xac minh   " + code);
-            res.json({
-                result: true,
-                message: "Đã gửi OTP thành công"
-            });
-        });
-        //  key_OTP se bi xoa trong vong 3 phut   =>>>>> bug then  2 acconut send OTP 
-        setTimeout(() => {
-            keyOTP.splice(keyOTP.indexOf(code), 1);
-        }, 1000 * 60);
+    var token = decoded();
+    var user = await User.findOne({ "_id": token.UserId });
 
-    } else {
-        res.json({
-            message: "Bạn cần phải đăng nhập để thực hiện chức năng này",
-            result: false
-        });
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: messageRes.USERNAME_NOT_FOUND,
+            data: null
+        })
     }
-    console.log(keyOTP);
+
+
+
 };
 
-//  Xác thực mã OTP
-module.exports.accuracyPhone_NB_key_OTP = async (req, res) => {
+module.exports.ConfirmEmailNews = async (req, res) => {
 
-    if (req.isAuthenticated()) {
-        let { key_OTP, number_phone } = req.body;
-        if (keyOTP.indexOf(parseInt(key_OTP)) === -1) {
-            res.json({
-                message: "Vui lòng kiểu tra lại mã OTP hoặc OTP của bạn quá lâu! Bạn cần chờ 60 giây để nhập lại mã",
-                result: false
-            });
-        } else {
-            await User.findByIdAndUpdate({ "_id": req.user.id }, { "role": "CHUNHATRO", "number_phone": number_phone }, (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    message: "Xác thực thành công",
-                    result: true
-                })
-                // The key_OTP will be delete if process success
-                keyOTP.splice(keyOTP.indexOf(key_OTP), 1);
-            })
-
-        }
-    } else {
-        res.json({
-            message: "Bạn cần phải đăng nhập để thực hiện chức năng này",
-            result: false
-        });
-    }
-}
+};
 
 // Đổi mật khẩu
 module.exports.ChangePassword = async (req, res) => {
@@ -340,18 +292,22 @@ module.exports.getInforUserById = async (req, res) => {
 }
 
 //  Edit profile User
-module.exports.getInforUserEdit = (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({
-            user: req.user
-        })
+module.exports.getInforUserEdit = async (req, res) => {
+    var token = decoded(req);
+    var user = await User.findOne({ "_id": token.UserId });
 
-    } else {
-        res.json({
-            message: "Bạn cần phải đăng nhập để thực hiện chức năng này",
-            result: false
-        });
+    if (!user) {
+        return res.status(404).json({
+            result: false,
+            message: messageRes.USERNAME_NOT_FOUND
+        })
     }
+
+    return res.status(200).json({
+        result: true,
+        message: messageRes.INF_SUCCESSFULLY,
+        data: user
+    })
 }
 
 // Upload image user avatar
@@ -416,22 +372,17 @@ module.exports.OpenAvatarUser = async (req, res) => {
 
 module.exports.EditedInforUser = async (req, res) => {
     try {
-        let { firstname, lastname, male, female, img_avatar } = req.body;
-        await User.findByIdAndUpdate({ "_id": req.user.id }, {
-            "infor.firstname": firstname, "infor.lastname": lastname, "infor.male_female.male": male,
-            "infor.male_female.female": female, "infor.img_avatar": img_avatar
-        }, (err, result) => {
-            if (err) console.log(err);
-            User.findById({ "_id": result._id }, (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    useredited: result,
-                    result: true,
-                    message: "Chỉnh sửa thông tin thành công!!!"
-                })
-            })
+        let { firstname, lastname, gender, password } = req.body;
+        const token = decoded(req);
 
-        })
+        var user = await User.findOne({ "_id": token.UserId });
+        if (!user) {
+            return res.status(404).json({
+                result: false,
+                message: messageRes.USERNAME_NOT_FOUND
+            })
+        }
+
     } catch (err) {
         res.json({
             result: false,
