@@ -40,8 +40,7 @@ module.exports.login = async (req, res) => {
         if (!user.isEmailComfirm) {
             return res.status(400).json({
                 success: false,
-                message: messageRes.USERNAME_OR_PASSWORD_INCORRECT,
-                // config message
+                message: messageRes.EMAIL_IS_NOT_CONFIRM,
             });
         }
 
@@ -131,21 +130,36 @@ module.exports.register = async (req, res) => {
     }
 };
 
-// get infor user login
-module.exports.logout = (req, res) => {
-    if (req.isAuthenticated()) {
-        req.logout();
-        res.json({
-            message: "Đăng xuất thành công",
-            result: true
+module.exports.comfirmEmail = async (req, res) => {
+
+    try {
+        var { idUser } = req.body;
+        var user = await User.findOne({ _id: idUser });
+
+        if (!user) {
+            return res.status(404).json({
+                result: false,
+                message: messageRes.USERNAME_NOT_FOUND
+            })
+        }
+
+        user.isEmailComfirm = true
+        user = AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
+        await user.save();
+
+        return res.status(200).json({
+            result: true,
+            message: messageRes.INF_SUCCESSFULLY
         })
-    } else {
-        res.json({
-            message: "Bạn không có quyền này",
-            result: false
-        });
     }
-};
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            result: false,
+            message: messageRes.INTERVAL_SERVER
+        })
+    }
+}
 //
 module.exports.getInforUser = async (req, res) => {
 

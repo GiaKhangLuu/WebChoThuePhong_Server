@@ -5,6 +5,7 @@ module.exports = {
     USERNAME_NOT_FOUND: "Không tìm thấy người dùng",
     EMAIL_ALREADY_TAKEN: "Email đã tồn tại",
     EMAIL_INCORRECT_FORMAT: "Email không đúng định dạng",
+    EMAIL_IS_NOT_CONFIRM: "Tài khoản chưa xác nhận Email,vui lòng kiểm tra lại",
     INTERVAL_SERVER: "Lỗi không xác định",
     NEWS_NOT_FOUND: "Không tìm thấy tin đăng",
     PHONE_IS_NOT_VALID: "Số điện thoại không đúng định dạng",
