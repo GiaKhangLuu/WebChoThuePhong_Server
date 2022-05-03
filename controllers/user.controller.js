@@ -13,6 +13,7 @@ var FeedBack = require('../models/User/feedback')
 const AuditLogSystem = require('../common/audit.log');
 const EmailCommon = require("../common/email.constaint");
 const mailer = require('../utils/mailer');
+const role = require('../common/role');
 
 //###########__Login__#####################
 module.exports.login = async (req, res) => {
@@ -72,7 +73,8 @@ module.exports.login = async (req, res) => {
 
 //###########__Register__###################
 module.exports.register = async (req, res) => {
-    const { username, password, email, firstname, lastname, gender } = req.body;
+    const { username, password, email, firstname, lastname,
+        gender, city, district, street, address_detail } = req.body;
 
     try {
         var user = await User.findOne({ "local.username": username });
@@ -105,7 +107,11 @@ module.exports.register = async (req, res) => {
             "local.email": email,
             "infor.firstname": firstname,
             "infor.lastname": lastname,
-            "infor.gender": gender
+            "infor.gender": gender,
+            "address.city": city,
+            "address.district": district,
+            "address.street": street,
+            "address.address_detail": address_detail,
         });
 
         if (newUser.infor.gender) {
@@ -190,23 +196,60 @@ module.exports.getInforUser = async (req, res) => {
 
 module.exports.accuracyEmail = async (req, res) => {
 
-    var token = decoded();
+    var token = decoded(req);
     var user = await User.findOne({ "_id": token.UserId });
 
     if (!user) {
         return res.status(404).json({
             success: false,
             message: messageRes.USERNAME_NOT_FOUND,
-            data: null
+
         })
     }
 
+    if (!user.isEmailComfirm) {
+        return res.status(400).json({
+            success: false,
+            message: messageRes.EMAIL_IS_NOT_CONFIRM,
 
+        })
+    }
 
+    await mailer.sendMail(user.local.email, EmailCommon.EMAIL_POST_NEWS_SUBJECT, EmailCommon.EMAIL_POST_NEWS_TEMPLATE);
+    return res.status(200).json({
+        success: true,
+        message: messageRes.INF_SUCCESSFULLY
+    })
 };
 
 module.exports.ConfirmEmailNews = async (req, res) => {
 
+    var token = decoded(req);
+    var user = await User.findOne({ "_id": token.UserId });
+
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: messageRes.USERNAME_NOT_FOUND,
+
+        })
+    }
+
+    if (!user.isEmailComfirm) {
+        return res.status(400).json({
+            success: false,
+            message: messageRes.EMAIL_IS_NOT_CONFIRM,
+
+        })
+    }
+    user.role = role.CHUNHATRO
+    user = await AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
+    await user.save();
+
+    return res.status(200).json({
+        success: true,
+        message: messageRes.INF_SUCCESSFULLY,
+    })
 };
 
 // Đổi mật khẩu
@@ -410,6 +453,8 @@ module.exports.EditedInforUser = async (req, res) => {
                 message: messageRes.USERNAME_NOT_FOUND
             })
         }
+
+
 
     } catch (err) {
         res.json({
