@@ -10,7 +10,7 @@ router.post("/dang-nhap", controller.login);
 
 //################__Register___####################
 router.post("/dang-ky", controller.register);
-
+router.post("/tai-khoan/kich-hoat", controller.comfirmEmail);
 
 
 router.get("/thong-tin", authorize([role.CHUNHATRO, role.MEMBER]), controller.getInforUser);
@@ -18,7 +18,7 @@ router.post("/xac-thuc/gui-email", authorize([role.MEMBER]), controller.accuracy
 router.post("/xac-thuc/xac-nhan-email", authorize([role.MEMBER]), controller.accuracyPhone_NB);
 
 
-router.get('/dang-xuat', controller.logout);
+
 router.post('/doi-mat-khau', controller.ChangePassword);
 router.post('/danh-gia', controller.FeedBack);
 router.get('/danh-gia', controller.GetFeedBack);

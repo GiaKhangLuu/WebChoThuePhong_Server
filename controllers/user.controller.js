@@ -11,6 +11,8 @@ require('dotenv').config();
 var User = require('../models/User/user.model')
 var FeedBack = require('../models/User/feedback')
 const AuditLogSystem = require('../common/audit.log');
+const EmailCommon = require("../common/email.constaint");
+const mailer = require('../utils/mailer');
 
 //###########__Login__#####################
 module.exports.login = async (req, res) => {
@@ -26,14 +28,23 @@ module.exports.login = async (req, res) => {
             })
         }
         const passwordValid = await argon2.verify(user.local.password, password);
-        if (!passwordValid)
+        if (!passwordValid) {
             return res.status(400).json({
                 success: false,
                 message: messageRes.USERNAME_OR_PASSWORD_INCORRECT,
 
             });
+        }
+
+
+        if (!user.isEmailComfirm) {
+            return res.status(400).json({
+                success: false,
+                message: messageRes.EMAIL_IS_NOT_CONFIRM,
+            });
+        }
+
         //Correct
-        console.log(user.role);
         const accessToken = jwt.sign(
             { UserId: user._id, UserName: user.local.username, Role: user.role },
             process.env.ACCESS_TOKEN_SECRET,
@@ -106,32 +117,49 @@ module.exports.register = async (req, res) => {
         //set audit log Create
         newUser = AuditLogSystem.SetCreateInfo(newUser._id, newUser.local.username, newUser);
         await newUser.save();
-        res.json({
+
+        await mailer.sendMail(email, EmailCommon.EMAIL_REGISTER_SUBJECT, EmailCommon.EMAIL_REGISTER_TEMPLATE);
+        return res.status(200).json({
             success: true,
             message: messageRes.REGISTER_SUCCESSFULLY,
             data: newUser._id
         })
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: messageRes.INTERVAL_SERVER })
+        return res.status(500).json({ success: false, message: messageRes.INTERVAL_SERVER })
     }
 };
 
-// get infor user login
-module.exports.logout = (req, res) => {
-    if (req.isAuthenticated()) {
-        req.logout();
-        res.json({
-            message: "Đăng xuất thành công",
-            result: true
+module.exports.comfirmEmail = async (req, res) => {
+
+    try {
+        var { idUser } = req.body;
+        var user = await User.findOne({ _id: idUser });
+
+        if (!user) {
+            return res.status(404).json({
+                result: false,
+                message: messageRes.USERNAME_NOT_FOUND
+            })
+        }
+
+        user.isEmailComfirm = true
+        user = AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
+        await user.save();
+
+        return res.status(200).json({
+            result: true,
+            message: messageRes.INF_SUCCESSFULLY
         })
-    } else {
-        res.json({
-            message: "Bạn không có quyền này",
-            result: false
-        });
     }
-};
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            result: false,
+            message: messageRes.INTERVAL_SERVER
+        })
+    }
+}
 //
 module.exports.getInforUser = async (req, res) => {
 
