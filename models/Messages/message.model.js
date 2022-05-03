@@ -6,10 +6,6 @@ var MessageSchema = new mongoose.Schema(
             type:String,
             required:true
         },
-        id_receiver: {
-         type: String,
-         require: true
-        },
         message_content: {
           type: String,
           require: true
