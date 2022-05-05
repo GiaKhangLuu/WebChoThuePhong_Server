@@ -41,16 +41,23 @@ module.exports.News_Special = async (req, res) => {
 
 module.exports.News_Detail = async (req, res) => {
     try {
-        await News.find({ "_id": req.params.id }, (err, result) => {
-            if (err) console.log(err);
-            res.json({
-                news: result
+        const news = await News.find({ "_id": req.params.id });
+        if (!news) {
+            return res.status(404).json({
+                success: false,
+                data: news,
+                message: MessageRes.NEWS_NOT_FOUND
             })
+        }
+        else return res.status(200).json({
+            success: true,
+            data: news,
+            message: MessageRes.INF_SUCCESSFULLY
         })
 
     } catch (err) {
         res.json({
-            result: false,
+            success: false,
             message: err
         })
     }
