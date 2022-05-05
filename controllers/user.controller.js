@@ -448,7 +448,8 @@ module.exports.OpenAvatarUser = async (req, res) => {
 
 module.exports.EditedInforUser = async (req, res) => {
     try {
-        let { firstname, lastname, gender, password } = req.body;
+        let { firstname, lastname, gender, phone
+            , city, district, street, address_detail } = req.body;
         const token = decoded(req);
 
         var user = await User.findOne({ "_id": token.UserId });
@@ -459,11 +460,48 @@ module.exports.EditedInforUser = async (req, res) => {
             })
         }
 
+        if (firstname != null || firstname != undefined || fisrtname != '') {
+            user.info.firstname = firstname;
+        }
 
+        if (lastname != null || lastname != undefined || lastname != '') {
+            user.info.lastname = lastname;
+        }
 
+        if (phone != null || phone != undefined || phone != '') {
+            user.number_phone = phone;
+        }
+
+        if (gender != null || gender != undefined || gender != '') {
+            user.info.gender = gender;
+        }
+
+        if (city != null || city != undefined || city != '') {
+            user.address.city = city;
+        }
+
+        if (district != null || district != undefined || district != '') {
+            user.address.district = district;
+        }
+
+        if (street != null || street != undefined || street != '') {
+            user.address.street = street;
+        }
+
+        if (address_detail != null || address_detail != undefined || address_detail != '') {
+            user.address.address_detail = address_detail;
+        }
+
+        user = AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: messageRes.UPDATE_SUCCESSFULLY
+        })
     } catch (err) {
-        res.json({
-            result: false,
+        return res.status.json({
+            success: false,
             message: err
         })
     }
