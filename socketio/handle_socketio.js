@@ -1,5 +1,6 @@
 var User = require('../models/User/user.model')
 var ChatRoom = require('../models/Messages/chatroom.model')
+var Message = require('../models/Messages/message.model')
 
 // Get all rooms of user
 const FetchRooms = async userId => {
@@ -11,7 +12,7 @@ const FetchRooms = async userId => {
 module.exports.JoinRooms = async (socket, data) => {
     const userId = data.user_id
     const rooms = await FetchRooms(userId);
-    //console.log(rooms)
+    console.log(rooms)
     // Join rooms
     rooms.forEach(room => {
         socket.join(`room: ${ room._id }` );
@@ -40,11 +41,14 @@ module.exports.ReceiveMessage = async (io, data) => {
         room_id = rooms[0]._id
     }
 
-  io.to(`room: ${ room_id }` ).emit('renderMessage', {
-    message: message,
-    receiver_id: receiver_id,
-    sender_id: sender_id
-  })
+    // Create message
+    Message.CreateMessage(sender_id, message, room_id)
+
+    io.to(`room: ${ room_id }` ).emit('renderMessage', {
+        message: message,
+        receiver_id: receiver_id,
+        sender_id: sender_id
+    })
 }
 
 // Set socket's name by userId
