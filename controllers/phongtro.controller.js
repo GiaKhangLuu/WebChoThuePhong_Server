@@ -8,7 +8,7 @@ var AuditLogSystem = require('../common/audit.log');
 const status_news = require('../common/status.news');
 const messageRes = require('../common/message.res');
 require("dotenv");
-
+const cloudinary = require('cloudinary').v2;
 
 
 
@@ -132,7 +132,7 @@ module.exports.DeleteImageInfor = async (req, res) => {
 // Căn hộ
 module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
-
+    // console.log(req.body);
     let { title, content_infor, number_phone, price, acreage, img_avatar, img_infor,
         city, district, street, nb_bedroom, nb_bath_toilet,
         nb_kitchenroom, utilities, typehome, address_detail } = req.body;
@@ -166,8 +166,17 @@ module.exports.PostNews = async (req, res) => {
     news.infor.nb_bath_toilet = nb_bath_toilet;
     news.infor.nb_kitchenroom = nb_kitchenroom;
     // Image
-    news.img_avatar = img_avatar;
-    news.img_infor = img_infor;
+    try {
+        const imageAvatarResult = await cloudinary.uploader.upload(img_avatar);
+        news.img_avatar = imageAvatarResult.url;
+        for (let i = 0; i < img_infor.length; i++) {
+            var imageInfoResult = await cloudinary.uploader.upload(img_infor[i]);
+            news.img_infor[i] = imageInfoResult.url;
+        }
+    }
+    catch (err) {
+        res.status(500).json({ err: 'Lỗi không upload được hình ảnh' });
+    }
     // Utilities
     news.utilities.isChecked_wifi = utilities.isChecked_wifi;
     news.utilities.isChecked_mezzanine = utilities.isChecked_mezzanine;
@@ -189,17 +198,19 @@ module.exports.PostNews = async (req, res) => {
 
 
     news = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, news);
-    news.save((err) => {
+    await news.save((err) => {
         if (err) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Đăng tin thất bại",
                 result: true
             });
-        };
-        res.json({
-            message: "Đăng tin thành công",
-            result: true
-        });
+        }
+        else {
+            return res.status(200).json({
+                message: "Đăng tin thành công",
+                result: true
+            });
+        }
     });
 }
 
