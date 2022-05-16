@@ -4,7 +4,8 @@ var messageController = require('../../controllers/Messages/message.controller')
 var authorize = require('../../midleware/verify.token');
 var role = require('../../common/role');
 
-router.post("/tao-message", messageController.CreateMessage)
+router.post("/tai-tin-nhan", messageController.LoadOldMessages)
+router.post("/tai-room", messageController.LoadRooms)
 
 //login
 module.exports = router;
