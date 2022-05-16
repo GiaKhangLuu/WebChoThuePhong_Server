@@ -14,6 +14,7 @@ const AuditLogSystem = require('../common/audit.log');
 const EmailCommon = require("../common/email.constaint");
 const mailer = require('../utils/mailer');
 const role = require('../common/role');
+const cloudinary = require('cloudinary').v2;
 
 //###########__Login__#####################
 module.exports.login = async (req, res) => {
@@ -398,35 +399,54 @@ const uploadAvatarUser = multer({
     limits: { fileSize: 1000000 },
 }).single("file");
 
+const isBase64 = require('is-base64');
+function CheckBase64Image(str) {
+    if (str === '' || str.trim() === '') { return false; }
+    try {
+        return isBase64(str, { allowMime: true })
+    } catch (err) {
+        return false;
+    }
+}
 module.exports.UploadUserEditAvatar = async (req, res) => {
     try {
-        if (req.isAuthenticated()) {
-            await uploadAvatarUser(req, res, (err) => {
-                if (err) {
-                    console.log(err);
-                    res.json({
-                        result: false,
-                        message_err: "Không thể upload Ảnh"
-                    })
-                };
-                res.json({
-                    result: true,
-                    filename_avatar: req.file.filename
-                });
-            });
-        } else {
-            res.json({
-                message: "Bạn không có quyền này",
-                result: false
-            });
+        const token = decoded(req);
+        let img_avatar = req.body.img_avatar;
+        var user = await User.findOne({ "_id": token.UserId });
+        if (!user) {
+            return res.status(404).json({
+                result: false,
+                message: messageRes.USERNAME_NOT_FOUND
+            })
         }
-    } catch (err) {
-        console.log(err);
+        if (user.infor.img_avatar === img_avatar) {
+            return res.status(200).json({
+                success: true,
+                message: messageRes.UPDATE_SUCCESSFULLY
+            })
+        }
 
-        res.json({
-            result: false,
-            message_err: "Không thể upload Ảnh"
-        });
+        if (CheckBase64Image(img_avatar) == false) {
+            return res.status(400).json({
+                success: false,
+                message: "Hình ảnh không phải là base64 vui lòng thử lại"
+            })
+        }
+
+        const imageAvatarResult = await cloudinary.uploader.upload(img_avatar);
+        user.infor.img_avatar = imageAvatarResult.url;
+        user = AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: messageRes.UPDATE_SUCCESSFULLY
+        })
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err
+        })
     }
 
 }
