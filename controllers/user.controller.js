@@ -451,7 +451,6 @@ module.exports.EditedInforUser = async (req, res) => {
         let { firstname, lastname, gender, phone
             , city, district, street, address_detail } = req.body;
         const token = decoded(req);
-
         var user = await User.findOne({ "_id": token.UserId });
         if (!user) {
             return res.status(404).json({
@@ -460,37 +459,39 @@ module.exports.EditedInforUser = async (req, res) => {
             })
         }
 
-        if (firstname != null || firstname != undefined || fisrtname != '') {
-            user.info.firstname = firstname;
+        if (firstname != null && firstname != undefined && firstname != '') {
+
+            user.infor.firstname = firstname;
+
         }
 
-        if (lastname != null || lastname != undefined || lastname != '') {
-            user.info.lastname = lastname;
+        if (lastname != null && lastname != undefined && lastname != '') {
+            user.infor.lastname = lastname;
         }
 
-        if (phone != null || phone != undefined || phone != '') {
+        if (phone != null && phone != undefined && phone != '') {
             user.number_phone = phone;
         }
 
-        if (gender != null || gender != undefined || gender != '') {
-            user.info.gender = gender;
-        }
 
-        if (city != null || city != undefined || city != '') {
+        user.infor.gender = gender;
+
+        if (city != null && city != undefined && city != '') {
             user.address.city = city;
         }
 
-        if (district != null || district != undefined || district != '') {
+        if (district != null && district != undefined && district != '') {
             user.address.district = district;
         }
 
-        if (street != null || street != undefined || street != '') {
+        if (street != null && street != undefined && street != '') {
             user.address.street = street;
         }
 
-        if (address_detail != null || address_detail != undefined || address_detail != '') {
+        if (address_detail != null && address_detail != undefined && address_detail != '') {
             user.address.address_detail = address_detail;
         }
+
 
         user = AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
         await user.save();

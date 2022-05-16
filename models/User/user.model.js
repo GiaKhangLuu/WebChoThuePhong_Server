@@ -58,7 +58,7 @@ function UserSchema(add) {
                 default: 'MEMBER'
             },
             number_phone: {
-                type: Number,
+                type: String,
                 default: ''
             },
             isEmailComfirm: {
