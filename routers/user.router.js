@@ -24,8 +24,7 @@ router.post('/danh-gia', controller.FeedBack);
 router.get('/danh-gia', controller.GetFeedBack);
 router.get("/thong-tin/:id", controller.getInforUserById);
 router.get("/chinh-sua-thong-tin", authorize([role.CHUNHATRO, role.MEMBER]), controller.getInforUserEdit);
-router.post("/chinh-sua-thong-tin/anh-dai-dien", controller.UploadUserEditAvatar);
-router.get("/open_image/nameimage=:nameimage", controller.OpenAvatarUser);
+router.post("/chinh-sua-thong-tin/anh-dai-dien", authorize([role.CHUNHATRO, role.MEMBER]), controller.UploadUserEditAvatar);
 router.post("/chinh-sua-thong-tin", controller.EditedInforUser);
 
 
