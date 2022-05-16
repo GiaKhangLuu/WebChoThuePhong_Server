@@ -84,28 +84,28 @@ app.get('/', (req, res) => {
 // ======================= SocketIO ======================
 io.on('connection', async (socket) => {
 
-    // Set up socket
-    socket.on('setUpSocket', async data=> {
-        handle_socketio.SetSocketName(socket, data)
-        console.log(`${ new Date().toLocaleTimeString() }: ${ socket.id } - ${ socket.name } has connected`);
-        await handle_socketio.JoinRooms(socket, data);
-        const sockets = await io.fetchSockets();
-       sockets.forEach(socket => {
-        console.log(socket.id + ' - ' + socket.name)
-      })
-    });
-
-
-
-
-
-    // Handle user send message
-    socket.on('sendMessage',async data => {
-        await handle_socketio.ReceiveMessage(io, data)
+  // Set up socket
+  socket.on('setUpSocket', async data => {
+    handle_socketio.SetSocketName(socket, data)
+    console.log(`${new Date().toLocaleTimeString()}: ${socket.id} - ${socket.name} has connected`);
+    await handle_socketio.JoinRooms(socket, data);
+    const sockets = await io.fetchSockets();
+    sockets.forEach(socket => {
+      console.log(socket.id + ' - ' + socket.name)
     })
+  });
+
+
+
+
+
+  // Handle user send message
+  socket.on('sendMessage', async data => {
+    await handle_socketio.ReceiveMessage(io, data)
+  })
 })
 
 server.listen(PORT, (err) => {
   if (err) console.log(err);
-  console.log(`Listen port ${PORT}`);
+  console.log(`Server chạy ở port: ${PORT}`);
 });
