@@ -500,7 +500,7 @@ module.exports.EditedInforUser = async (req, res) => {
             message: messageRes.UPDATE_SUCCESSFULLY
         })
     } catch (err) {
-        return res.status.json({
+        return res.status(500).json({
             success: false,
             message: err
         })
