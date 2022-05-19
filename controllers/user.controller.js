@@ -284,9 +284,6 @@ module.exports.ChangePassword = async (req, res) => {
 
                 });
             }
-
-
-
         });
 
     } else {

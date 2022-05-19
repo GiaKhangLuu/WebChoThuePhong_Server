@@ -41,7 +41,7 @@ module.exports.News_Special = async (req, res) => {
 
 module.exports.News_Detail = async (req, res) => {
     try {
-        const news = await News.find({ "_id": req.params.id });
+        const news = await News.findOne({ "_id": req.params.id });
         if (!news) {
             return res.status(404).json({
                 success: false,
