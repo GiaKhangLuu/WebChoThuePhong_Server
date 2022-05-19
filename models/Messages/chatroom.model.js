@@ -58,7 +58,7 @@ module.exports.FindUserInforOfAllRooms = async userId => {
                 populate({ 
                     path: 'members', 
                     match: { _id: { $ne: mongoose.Types.ObjectId(userId) } },
-                    select: '_id infor'
+                    select: '_id infor local.username'
                 })
             rs.push({ 'room_info': room_info, 
                       'last_message_time': lastMessageTime })
