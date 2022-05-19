@@ -46,8 +46,8 @@ module.exports.ReceiveMessage = async (io, data) => {
 
     io.to(`room: ${ room_id }` ).emit('renderMessage', {
         message: message,
-        receiver_id: receiver_id,
-        sender_id: sender_id
+        id_receiver: receiver_id,
+        id_sender: sender_id
     })
 }
 

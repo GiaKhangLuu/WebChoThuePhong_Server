@@ -19,7 +19,7 @@ module.exports.FindAllRoomsOfUser = async userId => {
         const rooms = await ChatRoom.
             find({ 'members': mongoose.Types.ObjectId(userId) }).
             populate({ 
-                path: 'members', 
+                pat: 'members', 
                 match: { _id: { $ne: mongoose.Types.ObjectId(userId) } },
                 select: '_id infor'
             })
@@ -45,7 +45,7 @@ module.exports.FindUserInforOfAllRooms = async userId => {
             arrExp.push(expression);
         }
 
-        rooms =  await Message.GetRoomIdSortByLastMessageTime(arrExp) 
+        room =  await Message.GetRoomIdSortByLastMessageTime(arrExp) 
 
         var rs = []
 
