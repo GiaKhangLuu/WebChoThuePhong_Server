@@ -45,7 +45,7 @@ module.exports.FindUserInforOfAllRooms = async userId => {
             arrExp.push(expression);
         }
 
-        room =  await Message.GetRoomIdSortByLastMessageTime(arrExp) 
+        rooms =  await Message.GetRoomIdSortByLastMessageTime(arrExp) 
 
         var rs = []
 
