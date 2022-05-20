@@ -9,9 +9,8 @@ router.post("/dang-nhap", controller.login);
 
 
 //################__Register___####################
-
-router.post("/tai-khoan/kich-hoat", controller.comfirmEmail);
 router.post("/dang-ky", controller.register);
+router.post("/tai-khoan/kich-hoat", controller.comfirmEmail);
 
 
 router.get("/thong-tin", authorize([role.CHUNHATRO, role.MEMBER]), controller.getInforUser);
