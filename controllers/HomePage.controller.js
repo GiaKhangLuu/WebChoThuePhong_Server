@@ -95,17 +95,24 @@ module.exports.GetNameDictrict = async (req, res) => {
 }
 module.exports.NewsNears = async (req, res) => {
     try {
-        await News.find({ "address.code_city": req.params.code_city, "address.code_dictrict": req.params.code_dictrict }, (err, result) => {
-            if (err) console.log(err);
-            res.json({
-                NewsNears: result
-            })
+        const { city, typehome } = req.body;
+        await News.find({ "address.city": city, "infor.typehome": typehome }, (err, result) => {
+            if (err) return res.status(400).json({
+                success: false,
+                meesage: MessageRes.NEWS_NOT_FOUND
+            });
+            else {
+                return res.status(200).json({
+                    success: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: result
+                })
+            }
         })
     } catch (err) {
-        res.json({
-            result: false,
-            NewsNears: '',
-            message: err
+        return res.status(500).json({
+            success: false,
+            message: MessageRes.INTERVAL_SERVER
         })
     }
 }

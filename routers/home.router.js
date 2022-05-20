@@ -9,7 +9,7 @@ router.get("/tin-can-ho", controller.News_ApartmentHome);
 router.get("/thong-tin-chi-tiet/:id", controller.News_Detail);
 router.get("/thong-tin-chi-tiet/city/:code_city", controller.GetNameCity);
 router.get("/thong-tin-chi-tiet/dictrict/:code_dictrict", controller.GetNameDictrict);
-router.get("/tin-tuc-gan-do/:code_city/:code_dictrict", controller.NewsNears);
+router.get("/tin-tuc-lien-quan", controller.NewsNears);
 router.get("/tin-tuc-noi-bat", controller.News_Special);
 
 router.post("/tim-kiem", controller.NewsFilter);
