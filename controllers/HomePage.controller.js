@@ -96,7 +96,7 @@ module.exports.GetNameDictrict = async (req, res) => {
 module.exports.NewsNears = async (req, res) => {
     try {
         const { city, typehome } = req.body;
-        await News.find({ "address.city": city, "infor.typehome": typehome }, (err, result) => {
+        await News.find({ "address.city": city, "infor.typehome": typehome }).limit(4).exec((err, result) => {
             if (err) return res.status(400).json({
                 success: false,
                 meesage: MessageRes.NEWS_NOT_FOUND
