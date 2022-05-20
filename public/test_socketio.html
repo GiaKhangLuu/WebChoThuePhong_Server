@@ -13,7 +13,7 @@
 
   <form id='chat-form'>
     <input type='text' id='chat-mes'>
-    <button id='send-chat'>Gửi</button>
+    <input type='file' id='send-chat'>Gửi</input>
   </form>
 </body>
 
@@ -29,7 +29,8 @@
 
       const message = chatMes.value
       socket.emit('on-chat', {
-          message: message
+          message: message,
+           images: true 
         })
       chatMes.value = ''
 

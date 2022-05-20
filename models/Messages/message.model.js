@@ -1,15 +1,22 @@
 var mongoose = require('mongoose');
 var today = new Date();
+const cloudinary = require('cloudinary').v2;
+const isBase64 = require('is-base64');
+
 var MessageSchema = new mongoose.Schema(
     {
         id_sender:{
             type:String,
             required:true
         },
-
-        message_content: {
-            type: String,
-            require: true
+        message: {
+            content: { 
+                type: String,
+                default: ''
+            },
+            images: [{
+                type: String,
+            }],
         },
         status: {
             type: Number,
@@ -35,9 +42,10 @@ var Message = mongoose.model('Message', MessageSchema, 'Message')
 module.exports.CreateMessage = async (id_sender, message_content, id_room) => {
     var message = new Message()
     message.id_sender = id_sender
-    message.message_content = message_content
+    message.message = message_content
     message.id_room = mongoose.Types.ObjectId(id_room)
     message = await Message.create(message)
+
     return message
 }
 
@@ -69,4 +77,4 @@ module.exports.GetRoomIdSortByLastMessageTime = async (room_ids) => {
     ] )
     return conversations
 }
-//module.exports = Message;
+

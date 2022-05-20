@@ -1,6 +1,8 @@
 var User = require('../models/User/user.model')
 var ChatRoom = require('../models/Messages/chatroom.model')
 var Message = require('../models/Messages/message.model')
+const cloudinary = require('cloudinary').v2;
+const isBase64 = require('is-base64');
 
 // Get all rooms of user
 const FetchRooms = async userId => {
@@ -12,7 +14,6 @@ const FetchRooms = async userId => {
 module.exports.JoinRooms = async (socket, data) => {
     const userId = data.user_id
     const rooms = await FetchRooms(userId);
-    console.log(rooms)
     // Join rooms
     rooms.forEach(room => {
         socket.join(`room: ${ room._id }` );
@@ -41,11 +42,15 @@ module.exports.ReceiveMessage = async (io, data) => {
         room_id = rooms[0]._id
     }
 
+    // Handle image message 
+    var image_urls = await HandleMessageImage(message.images)
+    message.images = image_urls
+
+
     // Create message
     Message.CreateMessage(sender_id, message, room_id)
-
     io.to(`room: ${ room_id }` ).emit('renderMessage', {
-        message_content: message,
+        message: message,
         id_receiver: receiver_id,
         id_sender: sender_id
     })
@@ -65,4 +70,42 @@ const AddUsersToNewRoom = async (io, room_id, receiver_id, sender_id) => {
             socket.join(room)
       }
     })
+}
+
+// Image processing
+var CheckBase64Image = (str) => {
+    if (str === '' || str.trim() === '') { return false; }
+    try {
+        return isBase64(str, { allowMime: true })
+    } catch (err) {
+        return false;
+    }
+}
+
+const UploadUserEditAvatar = async (img_avatar) => {
+    try {
+        const imageAvatarResult = await cloudinary.uploader.upload(img_avatar);
+        img_avatar_url = imageAvatarResult.url;
+
+        return img_avatar_url
+
+    } catch (err) {
+        console.log(err)
+        return err
+    }
+
+}
+
+const HandleMessageImage = async (images) => {
+    try {
+        image_urls = []
+
+        for (var image of images) {
+            image_url = await UploadUserEditAvatar(image)
+            image_urls.push(image_url) 
+        }
+        return image_urls
+    } catch(err) {
+
+    }
 }
