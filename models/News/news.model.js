@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var today = new Date();
 var AuditLogSchema = require('../audit.log.model')
 function NewsSchema(add) {
     var schema = new Schema(
@@ -107,6 +106,9 @@ function NewsSchema(add) {
                 type: String,
                 required: true,
             }],
+            reason: {
+                type: String
+            },
             address: {
                 city: {
                     type: String,

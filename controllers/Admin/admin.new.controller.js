@@ -7,6 +7,7 @@ var News = require('../../models/News/news.model');
 var TypeNews = require('../../models/News/typenews.model');
 var messageRes = require('../../common/message.res');
 const status_news = require('../../common/status.news');
+var AuditLogSystem = require('../../common/audit.log');
 //################ Get all news ###########
 module.exports.GetAllNews = async (req, res) => {
   let news = await News.find()
@@ -46,7 +47,16 @@ module.exports.GetPendingNews = async (req, res) => {
 
 //################ Accept news  ###########
 module.exports.AcceptNews = async (req, res) => {
-  let news_id = req.body._id
+  let news_id = req.body._id;
+  var token = decoded(req);
+
+  if (reason == null || reason == undefined) {
+    return res.status(400).json({
+      success: true,
+      message: "Lý do từ chối không được bỏ trống",
+      data: news_id
+    })
+  }
   var news = await News.findOne({ _id: news_id });
   if (news == null) {
     return res.status(404).json({
@@ -63,6 +73,7 @@ module.exports.AcceptNews = async (req, res) => {
     })
   }
   news.infor.status_news = status_news.ACCEPTED;
+  AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, news)
   await news.save();
   return res.status(200).json({
     success: true,
@@ -76,6 +87,8 @@ module.exports.AcceptNews = async (req, res) => {
 //################ Deny news  ###########
 module.exports.DenyNews = async (req, res) => {
   let news_id = req.body._id
+  var token = decoded(req);
+  let reason = req.body.reason;
   var news = await News.findOne({ _id: news_id });
   if (news == null) {
     return res.status(404).json({
@@ -92,6 +105,8 @@ module.exports.DenyNews = async (req, res) => {
     })
   }
   news.infor.status_news = status_news.DENIED;
+  news.reason = reason;
+  AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, news)
   await news.save();
   return res.status(200).json({
     success: true,
@@ -99,4 +114,11 @@ module.exports.DenyNews = async (req, res) => {
     data: news_id
   })
 
+}
+
+
+var decoded = function (req) {
+  const authHeader = req.header('Authorization');
+  const token = authHeader && authHeader.split(' ')[1];
+  return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 }
