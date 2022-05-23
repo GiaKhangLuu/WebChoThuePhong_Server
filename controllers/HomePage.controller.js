@@ -2,7 +2,7 @@
 var News = require('../models/News/news.model');
 var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
-
+var ReportNews = require('../models/News/report.model');
 module.exports.News_All = async (req, res) => {
     try {
         await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(6).exec(
@@ -232,5 +232,39 @@ module.exports.NewsFilter = async (req, res) => {
     }
 }
 
+module.exports.ReportNews = async (req, res) => {
+
+    var { idNews, title, image, content, emailReporter } = req.body;
+
+    var news = await News.findOne({ "_id": idNews, "infor.status_news": StatusNews.ACCEPTED });
+    if (!news) {
+        return res.status(404).json({
+            result: false,
+            message: MessageRes.NEWS_NOT_FOUND
+        })
+    }
+
+    if ((content == null || content == undefined) && (image == null || image == undefined)) {
+        return res.status(400).json({
+            result: false,
+            message: "Hình ảnh và nội dung báo cáo không được trống cùng một lúc"
+        })
+    }
+    var newReport = new ReportNews({
+        idNews,
+        title,
+        image,
+        content,
+        emailReporter,
+        status: StatusNews.PENDING
+    });
+    await newReport.save();
+
+
+    return res.status(200).json({
+        result: true,
+        message: MessageRes.INF_SUCCESSFULLY
+    })
+}
 
 

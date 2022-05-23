@@ -12,6 +12,7 @@ router.get("/thong-tin-chi-tiet/dictrict/:code_dictrict", controller.GetNameDict
 router.post("/tin-tuc-lien-quan", controller.NewsNears);
 router.get("/tin-tuc-noi-bat", controller.News_Special);
 
+router.post("/bao-cao", controller.ReportNews);
 router.post("/tim-kiem", controller.NewsFilter);
 
 

@@ -17,7 +17,8 @@ router.post("/dang-tin-moi/xoa-anh-mo-ta", authorize(role.CHUNHATRO), controller
 const cpUpload = upload.fields([{ name: 'img_avatar', maxCount: 1 }, { name: 'img_infor', maxCount: 4 }])
 router.post("/dang-tin-moi", authorize(role.CHUNHATRO), cpUpload, controller.PostNews);
 
-
+router.get("/chi-tiet-bai-dang/:id", authorize(role.CHUNHATRO), controller.DetailNews);
+router.post("/cap-nhat-tin-dang/:id", authorize(role.CHUNHATRO), controller.UpdateNews);
 
 
 //################__Phong_Tro___####################
