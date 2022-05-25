@@ -10,6 +10,9 @@ module.exports = {
     NEWS_NOT_FOUND: "Không tìm thấy tin đăng",
     PHONE_IS_NOT_VALID: "Số điện thoại không đúng định dạng",
     FORBIDDEN_403: "Truy cập bị cấm",
+    IMG_IS_NOT_VALID: "Hình ảnh không đúng định dạng base64",
+    IMG_AND_CONTENT_IS_REQUIRED: "Hình ảnh và nội dung báo cáo không được trống cùng một lúc",
+    REPORTS_NOT_FOUND: "Không tìm thấy danh sách báo cáo",
     //RESULT SUCCESSFULLY
     REGISTER_SUCCESSFULLY: "Đăng ký thành công",
     LOGIN_SUCCESSFULLY: "Đăng nhập thành công",

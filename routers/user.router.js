@@ -6,7 +6,7 @@ var role = require('../common/role');
 
 //################__Login___####################
 router.post("/dang-nhap", controller.login);
-
+router.post("/refresh-token", controller.refreshToken);
 
 //################__Register___####################
 router.post("/dang-ky", controller.register);

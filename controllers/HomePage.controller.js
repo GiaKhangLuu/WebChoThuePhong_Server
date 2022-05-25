@@ -3,6 +3,8 @@ var News = require('../models/News/news.model');
 var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
+const isBase64 = require('is-base64');
+const cloudinary = require('cloudinary').v2;
 module.exports.News_All = async (req, res) => {
     try {
         await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(6).exec(
@@ -96,7 +98,7 @@ module.exports.GetNameDictrict = async (req, res) => {
 module.exports.NewsNears = async (req, res) => {
     try {
         const { city, typehome } = req.body;
-        await News.find({ "address.city": city, "infor.typehome": typehome }).limit(4).exec((err, result) => {
+        await News.find({ "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
             if (err) return res.status(400).json({
                 success: false,
                 meesage: MessageRes.NEWS_NOT_FOUND
@@ -247,17 +249,36 @@ module.exports.ReportNews = async (req, res) => {
     if ((content == null || content == undefined) && (image == null || image == undefined)) {
         return res.status(400).json({
             result: false,
-            message: "Hình ảnh và nội dung báo cáo không được trống cùng một lúc"
+            message: MessageRes.IMG_AND_CONTENT_IS_REQUIRED
         })
     }
+
+
+    if (!isValidEmail(emailReporter)) {
+        return res.status(400).json({
+            result: false,
+            message: MessageRes.EMAIL_INCORRECT_FORMAT
+        })
+    }
+
     var newReport = new ReportNews({
         idNews,
         title,
-        image,
         content,
         emailReporter,
         status: StatusNews.PENDING
     });
+
+    for (let i = 0; i < image.length; i++) {
+        if (!CheckBase64Image(image[i])) {
+            return res.status(400).json({
+                result: false,
+                message: MessageRes.IMG_IS_NOT_VALID
+            })
+        }
+        var imageInfoResult = await cloudinary.uploader.upload(image[i]);
+        newReport.image[i] = imageInfoResult.url;
+    }
     await newReport.save();
 
 
@@ -267,4 +288,16 @@ module.exports.ReportNews = async (req, res) => {
     })
 }
 
+var CheckBase64Image = (str) => {
+    if (str === '' || str.trim() === '') { return false; }
+    try {
+        return isBase64(str, { allowMime: true })
+    } catch (err) {
+        return false;
+    }
+}
 
+var isValidEmail = function (email) {
+    const pattern = "^(\\s+)?\\w+([-+.']\\w+)*@[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*\\.[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*(\\s+)?$";
+    return email.match(pattern);
+}

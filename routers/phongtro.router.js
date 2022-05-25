@@ -5,10 +5,7 @@ var authorize = require('../midleware/verify.token');
 var role = require('../common/role');
 const upload = require('../midleware/upload.image');
 
-//#########__Đăng tin upload_Image___##############
-router.post("/dang-tin-moi/upload_image", authorize(role.CHUNHATRO), controller.UploadAvarta);
-router.get("/open_image/nameimage=:imagename", authorize(role.CHUNHATRO), controller.getImageAvarta);
-router.post("/dang-tin-moi/xoa-anh-dai-dien", authorize(role.CHUNHATRO), controller.DeleteImageAvarta);
+
 
 router.post("/dang-tin-moi/up-load_hinh-mo-ta", authorize(role.CHUNHATRO), controller.UploadImageInfor);
 router.post("/dang-tin-moi/xoa-anh-mo-ta", authorize(role.CHUNHATRO), controller.DeleteImageInfor);
