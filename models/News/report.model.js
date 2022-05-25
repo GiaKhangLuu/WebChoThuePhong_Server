@@ -16,12 +16,15 @@ function ReportSchema(add) {
             content: {
                 type: String,
             },
-            image: {
-                type: String,
-            },
+            image: [{
+                type: String
+            }],
             emailReporter: {
                 type: String,
                 required: true
+            },
+            status: {
+                type: String
             }
         });
     if (add) {

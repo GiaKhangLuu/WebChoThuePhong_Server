@@ -1,4 +1,3 @@
-var User = require('../models/User/user.model')
 var ChatRoom = require('../models/Messages/chatroom.model')
 var Message = require('../models/Messages/message.model')
 const cloudinary = require('cloudinary').v2;
@@ -16,7 +15,7 @@ module.exports.JoinRooms = async (socket, data) => {
     const rooms = await FetchRooms(userId);
     // Join rooms
     rooms.forEach(room => {
-        socket.join(`room: ${ room._id }` );
+        socket.join(`room: ${room._id}`);
     });
 }
 
@@ -25,8 +24,8 @@ module.exports.ReceiveMessage = async (io, data) => {
     var receiver_id = data.IdReceiver
     var sender_id = data.IdSender
     var message = data.message
-    
-    var rooms = await ChatRoom.FindChatRoom(sender_id, receiver_id)  
+
+    var rooms = await ChatRoom.FindChatRoom(sender_id, receiver_id)
     var room_id
 
     // Sender and receiver havent chatted => create new room 
@@ -49,7 +48,7 @@ module.exports.ReceiveMessage = async (io, data) => {
 
     // Create message
     Message.CreateMessage(sender_id, message, room_id)
-    io.to(`room: ${ room_id }` ).emit('renderMessage', {
+    io.to(`room: ${room_id}`).emit('renderMessage', {
         message: message,
         id_receiver: receiver_id,
         id_sender: sender_id
@@ -63,12 +62,12 @@ module.exports.SetSocketName = async (socket, data) => {
 }
 
 const AddUsersToNewRoom = async (io, room_id, receiver_id, sender_id) => {
-    const room = `room: ${ room_id }`;
+    const room = `room: ${room_id}`;
     const sockets = await io.fetchSockets();
     sockets.forEach(socket => {
-      if (socket.name == receiver_id || socket.name == sender_id) {
+        if (socket.name == receiver_id || socket.name == sender_id) {
             socket.join(room)
-      }
+        }
     })
 }
 
@@ -102,10 +101,10 @@ const HandleMessageImage = async (images) => {
 
         for (var image of images) {
             image_url = await UploadUserEditAvatar(image)
-            image_urls.push(image_url) 
+            image_urls.push(image_url)
         }
         return image_urls
-    } catch(err) {
+    } catch (err) {
 
     }
 }

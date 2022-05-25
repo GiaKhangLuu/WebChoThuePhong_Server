@@ -64,6 +64,9 @@ function UserSchema(add) {
             isEmailComfirm: {
                 type: Boolean,
                 default: false
+            },
+            refreshToken: {
+                type: String
             }
         }
     );

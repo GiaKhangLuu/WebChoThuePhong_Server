@@ -8,6 +8,7 @@ var AuditLogSystem = require('../common/audit.log');
 const status_news = require('../common/status.news');
 const messageRes = require('../common/message.res');
 require("dotenv");
+const isBase64 = require('is-base64');
 const cloudinary = require('cloudinary').v2;
 
 
@@ -25,66 +26,6 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 1000000 },
 }).single("file");
-
-module.exports.UploadAvarta = async (req, res) => {
-    try {
-
-        await upload(req, res, (err) => {
-            console.log(err);
-            if (err) {
-                return res.status(400).json({
-                    result: false,
-                    message_err: "Không thể upload Ảnh"
-                })
-            };
-            res.setHeader('Content-Type', 'image/jpeg');
-            return res.status(200).json({
-                result: true,
-                filename_avatar: req.file.filename
-            });
-        });
-    } catch (err) {
-        return res.status(400).json({
-            result: false,
-            message_err: "Không thể upload Ảnh"
-        });
-    }
-
-}
-//#########__Open Image Avatar__##############//
-module.exports.getImageAvarta = async (req, res) => {
-
-    let imagename = "public/uploads/" + req.params.imagename;
-    await fs.readFile(imagename, (err, ImageData) => {
-        if (err) res.json({
-            result: false,
-            message_err: "Lỗi không thể load ảnh"
-        });
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.end(ImageData);
-    })
-}
-//#########__Delete Image Avatar__##############//
-
-module.exports.DeleteImageAvarta = async (req, res) => {
-    if (req.isAuthenticated() && 'CHUNHATRO' == req.user.role) {
-        let imagename = "public/uploads/" + req.body.filename_avatar;
-        await fs.unlink(imagename, (err) => {
-            if (err) res.json({
-                result: false,
-                message_err: "Lỗi không thể xóa ảnh"
-            });
-            res.json({
-                result: true
-            })
-        })
-    } else {
-        res.json({
-            message: "Bạn không có quyền này",
-            result: false
-        });
-    }
-}
 
 //#################__Upload Image Infor__#################
 
@@ -132,7 +73,13 @@ module.exports.DeleteImageInfor = async (req, res) => {
 // Căn hộ
 module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
-    // console.log(req.body);
+    var countNews = IsEnoughNewsHave(token.UserId);
+    if (countNews >= 3) {
+        return res.status(400).json({
+            success: false,
+            message: messageRes.USERNAME_NOT_FOUND
+        })
+    }
     let { title, content_infor, number_phone, price, acreage, img_avatar, img_infor,
         city, district, street, nb_bedroom, nb_bath_toilet,
         nb_kitchenroom, utilities, typehome, address_detail } = req.body;
@@ -167,9 +114,21 @@ module.exports.PostNews = async (req, res) => {
     news.infor.nb_kitchenroom = nb_kitchenroom;
     // Image
     try {
+        if (!CheckBase64Image(img_avatar)) {
+            return res.status(400).json({
+                result: false,
+                message: MessageRes.IMG_IS_NOT_VALID
+            })
+        }
         const imageAvatarResult = await cloudinary.uploader.upload(img_avatar);
         news.img_avatar = imageAvatarResult.url;
         for (let i = 0; i < img_infor.length; i++) {
+            if (!CheckBase64Image(img_infor[i])) {
+                return res.status(400).json({
+                    result: false,
+                    message: MessageRes.IMG_IS_NOT_VALID
+                })
+            }
             var imageInfoResult = await cloudinary.uploader.upload(img_infor[i]);
             news.img_infor[i] = imageInfoResult.url;
         }
@@ -234,7 +193,6 @@ module.exports.DetailNews = async (req, res) => {
 
 module.exports.UpdateNews = async (req, res) => {
     var token = decoded(req);
-    // console.log(req.body);
     let { title, content_infor, number_phone, price, acreage, img_avatar, img_infor,
         city, district, street, nb_bedroom, nb_bath_toilet,
         nb_kitchenroom, utilities, typehome, address_detail } = req.body;
@@ -268,16 +226,43 @@ module.exports.UpdateNews = async (req, res) => {
     // Image
     try {
         if (news.img_avatar != img_avatar) {
+            if (!CheckBase64Image(img_avatar)) {
+                return res.status(400).json({
+                    result: false,
+                    message: MessageRes.IMG_IS_NOT_VALID
+                })
+            }
             const imageAvatarResult = await cloudinary.uploader.upload(img_avatar);
             news.img_avatar = imageAvatarResult.url;
         }
 
-        for (let i = 0; i < img_infor.length; i++) {
-            if (news.img_infor[i] != img_infor.length) {
+        if (news.img_infor.length == img_infor.length) {
+            for (let i = 0; i < img_infor.length; i++) {
+                if (news.img_infor[i] != img_infor[i]) {
+                    if (!CheckBase64Image(img_infor[i])) {
+                        return res.status(400).json({
+                            result: false,
+                            message: MessageRes.IMG_IS_NOT_VALID
+                        })
+                    }
+                    var imageInfoResult = await cloudinary.uploader.upload(img_infor[i]);
+                    news.img_infor[i] = imageInfoResult.url;
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < img_infor.length; i++) {
+                if (!CheckBase64Image(img_infor[i])) {
+                    return res.status(400).json({
+                        result: false,
+                        message: MessageRes.IMG_IS_NOT_VALID
+                    })
+                }
                 var imageInfoResult = await cloudinary.uploader.upload(img_infor[i]);
                 news.img_infor[i] = imageInfoResult.url;
             }
         }
+
     }
     catch (err) {
         res.status(500).json({ err: 'Lỗi không upload được hình ảnh' });
@@ -362,6 +347,7 @@ module.exports.PostManagerNT = async (req, res) => {
 module.exports.PostManagerCH = async (req, res) => {
 
     var token = decoded(req);
+    IsEnoughNewsHave(token.UserId);
     await News.find({ "infor.iduser": token.UserId, "infor.typehome": 3 }, (err, result) => {
         if (err) {
             return res.status(400).json({
@@ -412,7 +398,11 @@ module.exports.PostManagerHiddenNews = async (req, res) => {
 }
 
 
-
+var IsEnoughNewsHave = async (userId) => {
+    var news = await News.find({ "infor.status_news": { $ne: status_news.DELETE }, "infor.iduser": userId })
+    console.log(news.length);
+    return news.length;
+}
 
 var decoded = function (req) {
     const authHeader = req.header('Authorization');
@@ -424,4 +414,13 @@ var decoded = function (req) {
 var isValidPhone = function (phone) {
     const pattern = "(\\+[0-9]{2}|\\+[0-9]{2}\\(0\\)|\\(\\+[0-9]{2}\\)\\(0\\)|00[0-9]{2}|0)([0-9]{9}|[0-9\\-\\s]{9,18})"
     return phone.match(pattern);
+}
+
+var CheckBase64Image = (str) => {
+    if (str === '' || str.trim() === '') { return false; }
+    try {
+        return isBase64(str, { allowMime: true })
+    } catch (err) {
+        return false;
+    }
 }

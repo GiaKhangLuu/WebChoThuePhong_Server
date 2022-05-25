@@ -1,6 +1,3 @@
-
-var rn = require('random-number'); // library ramdom number 
-var Nexmo = require('nexmo'); // library send OTP
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
@@ -58,7 +55,11 @@ module.exports.login = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        res.json({
+        user.refreshToken = refreshToken
+        await user.save();
+        AuditLogSystem.SetUpdateInfo(user._id, user.local.username, user);
+
+        return res.status(200).json({
             success: true,
             message: messageRes.LOGIN_SUCCESSFULLY,
             data: {
@@ -71,7 +72,30 @@ module.exports.login = async (req, res) => {
         res.status(500).json({ success: false, message: messageRes.INTERVAL_SERVER })
     };
 };
+module.exports.refreshToken = async (req, res) => {
+    var refreshToken = req.body.refreshToken;
 
+    var user = await User.findOne({ "refreshToken": refreshToken })
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            message: messageRes.USERNAME_NOT_FOUND,
+        });
+    }
+
+    const accessToken = jwt.sign(
+        { UserId: user._id, UserName: user.local.username, Role: user.role },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1h" }
+    );
+    return res.status(200).json({
+        success: true,
+        message: messageRes.INF_SUCCESSFULLY,
+        data: {
+            accessToken
+        }
+    })
+}
 //###########__Register__###################
 module.exports.register = async (req, res) => {
     const { username, password, email, firstname, lastname,
