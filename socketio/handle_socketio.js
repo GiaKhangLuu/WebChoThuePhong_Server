@@ -45,13 +45,18 @@ module.exports.ReceiveMessage = async (io, data) => {
     var image_urls = await HandleMessageImage(message.images)
     message.images = image_urls
 
-
     // Create message
     Message.CreateMessage(sender_id, message, room_id)
     io.to(`room: ${room_id}`).emit('renderMessage', {
         message: message,
         id_receiver: receiver_id,
         id_sender: sender_id
+    })
+
+    // Send notification
+    var unread_message_count = await ChatRoom.UnreadMessageCount(receiver_id)
+    io.to(`room: ${room_id}`).emit('notifyMessage', {
+        unread_message_count: unread_message_count
     })
 }
 
