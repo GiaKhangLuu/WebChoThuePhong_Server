@@ -199,7 +199,7 @@ module.exports.UpdateNews = async (req, res) => {
 
 
     if (!isValidPhone(number_phone)) {
-        return res.json.status(400)({
+        return res.status(400).json({
             success: false,
             message: messageRes.PHONE_IS_NOT_VALID
         })
