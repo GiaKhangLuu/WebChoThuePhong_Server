@@ -1,7 +1,7 @@
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
-
+var jwt = require("jsonwebtoken");
 var Comment = require('../../models/News/comment');
 var News = require('../../models/News/news.model');
 var TypeNews = require('../../models/News/typenews.model');
