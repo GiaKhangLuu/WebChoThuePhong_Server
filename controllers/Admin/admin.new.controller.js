@@ -86,8 +86,9 @@ module.exports.AcceptNews = async (req, res) => {
 
 //################ Deny news  ###########
 module.exports.DenyNews = async (req, res) => {
-  let news_id = req.body._id
   var token = decoded(req);
+  let news_id = req.body._id
+
   let reason = req.body.reason;
   var news = await News.findOne({ _id: news_id });
   if (news == null) {
