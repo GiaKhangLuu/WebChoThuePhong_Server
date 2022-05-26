@@ -56,6 +56,10 @@ module.exports.LoadOldMessages = async (room_id) => {
         // Stage 2 - sort by time
         { $sort: { time: 1 } }
     ]);
+
+    // Seen all messages after loading
+    SeenMessage(room_id)
+
     return messages
 }
 
@@ -78,3 +82,37 @@ module.exports.GetRoomIdSortByLastMessageTime = async (room_ids) => {
     return conversations
 }
 
+module.exports.GetUnreadMessageInRoom = async (room_ids) => {
+    const unread_messages = await Message.aggregate([
+        // Stage 1 - get all roomDetails by roomId
+        { $match: { $or: room_ids } },
+        // Stage 2 - find min message_status 
+        {
+            $group: {
+                _id: "$id_room",
+                message_status: { $min: "$status" },
+            }
+        },
+        // Stage 3 - clarify message which status = 0
+        {
+            $match: { message_status: 0 }
+        }
+    ] )
+
+    return unread_messages
+}
+
+const SeenMessage = async (room_id) => {
+    try {
+        var messages = await Message.update(
+            { id_room: mongoose.Types.ObjectId(room_id) },
+            { status: 1 },
+            { multi: true }
+        )
+        return messages
+
+    } catch(err) {
+        console.log(err)
+        return null
+    }
+}

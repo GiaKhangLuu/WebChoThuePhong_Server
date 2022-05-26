@@ -100,3 +100,35 @@ module.exports.FindChatRoom = async (sender_id, receiver_id) => {
     }
 }
 
+const GetMemberInRoom = async(user_id, room) => {
+    const member_id = await room.filter(id => id != user_id)
+    return member_id[0]
+}
+
+module.exports.UnreadMessageCount = async (user_id) => {
+    try {
+
+        // Get all rooms of user
+        var rooms = await this.FindAllRoomsOfUser(user_id)
+
+        // Put all roomId in array to filter
+        const arrExp = [];
+        for(const room of rooms) {
+            const _id = room._id.toString();
+            const room_expression =  { id_room: mongoose.Types.ObjectId(_id) } ;
+
+            const member_id = await GetMemberInRoom(user_id, room.members)
+            const member_expression = { id_sender: member_id.toString() };
+
+            const exp = { $and: [member_expression, room_expression] }
+            arrExp.push(exp);
+        }
+
+        rooms =  await Message.GetUnreadMessageInRoom(arrExp) 
+
+        return rooms.length
+    } catch(err) {
+        console.log(err)
+        return null
+    }
+}
