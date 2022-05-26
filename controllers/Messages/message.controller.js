@@ -77,3 +77,19 @@ module.exports.LoadRooms = async (req, res) => {
         res.status(500).json({ success: false })
     }
 }
+
+module.exports.UnreadMessageCount = async (req, res) => {
+    try {
+        var user_id = req.body.user_id
+        var unread_message_count = await ChatRoom.UnreadMessageCount(user_id)
+        
+        res.json({
+            success: true,
+            data: unread_message_count
+        })
+
+    } catch(err) {
+        console.log(err)
+        res.status(500).json({ success: false })
+    }
+}

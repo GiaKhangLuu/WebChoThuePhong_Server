@@ -97,10 +97,6 @@ io.on('connection', async (socket) => {
     })
   });
 
-
-
-
-
   // Handle user send message
   socket.on('sendMessage', async data => {
     await handle_socketio.ReceiveMessage(io, data)

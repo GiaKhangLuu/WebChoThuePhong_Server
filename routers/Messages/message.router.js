@@ -6,6 +6,7 @@ var role = require('../../common/role');
 
 router.post("/tai-tin-nhan", messageController.LoadOldMessages)
 router.post("/tai-room", messageController.LoadRooms)
+router.post('/dem-tin-nhan-chua-doc', messageController.UnreadMessageCount)
 
 //login
 module.exports = router;
