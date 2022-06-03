@@ -60,9 +60,12 @@ module.exports.FindUserInforOfAllRooms = async userId => {
                     match: { _id: { $ne: mongoose.Types.ObjectId(userId) } },
                     select: '_id infor local.username'
                 })
-            rs.push({ 'room_info': room_info, 
-                      'last_message_time': lastMessageTime })
 
+            var last_message = await Message.FindMessageByTime(room_id, lastMessageTime)
+
+            rs.push({ 'room_info': room_info, 
+                      'last_message_time': lastMessageTime,
+                      'last_message': last_message})
         } 
 
         return rs
