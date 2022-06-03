@@ -82,6 +82,20 @@ module.exports.GetRoomIdSortByLastMessageTime = async (room_ids) => {
     return conversations
 }
 
+module.exports.FindMessageByTime = async (room_id, time) => {
+    try {
+        const messages = await Message.aggregate([
+            { $match: { $and: [ { id_room: room_id }, { time: time } ] } },
+            { $project: { status: 1, id_sender: 1 } }
+        ])
+
+        return messages[messages.length - 1]
+
+    } catch(err) { 
+        console.log(err)
+    }
+}
+
 module.exports.GetUnreadMessageInRoom = async (room_ids) => {
     if (room_ids.length == 0) {
         return []
