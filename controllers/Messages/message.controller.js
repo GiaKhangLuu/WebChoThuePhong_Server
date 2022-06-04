@@ -48,7 +48,7 @@ module.exports.LoadOldMessages = async (req, res) => {
         var room_id = rooms[0]._id
 
         // Load old messages
-        var messages = await Message.LoadOldMessages(room_id)
+        var messages = await Message.LoadOldMessages(sender_id, room_id)
 
         res.json({
           success: true,

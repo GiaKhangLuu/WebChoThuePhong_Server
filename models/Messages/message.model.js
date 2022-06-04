@@ -49,7 +49,7 @@ module.exports.CreateMessage = async (id_sender, message_content, id_room) => {
     return message
 }
 
-module.exports.LoadOldMessages = async (room_id) => {
+module.exports.LoadOldMessages = async (user_id, room_id) => {
     const messages = await Message.aggregate([
         // Stage 1 - get all records in room by group roomId
         { $match: { id_room: mongoose.Types.ObjectId(room_id) } },
@@ -58,7 +58,7 @@ module.exports.LoadOldMessages = async (room_id) => {
     ]);
 
     // Seen all messages after loading
-    SeenMessage(room_id)
+    SeenMessage(user_id, messages)
 
     return messages
 }
@@ -119,14 +119,26 @@ module.exports.GetUnreadMessageInRoom = async (room_ids) => {
     return unread_messages
 }
 
-const SeenMessage = async (room_id) => {
+const SeenMessage = async (user_id, messages) => {
     try {
+        /*
         var messages = await Message.update(
             { id_room: mongoose.Types.ObjectId(room_id) },
             { status: 1 },
             { multi: true }
         )
-        return messages
+        //return messages
+        */
+
+        for (var message of messages) {
+            if(message.id_sender != user_id && message.status == 0) {
+                var new_message = await Message.findByIdAndUpdate(
+                    message._id,
+                    { status: 1 }
+                )
+            }
+        }
+        
 
     } catch(err) {
         console.log(err)
