@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const argon2 = require('argon2');
 require('dotenv').config();
 var User = require('../models/User/user.model')
-var FeedBack = require('../models/User/feedback')
+var FeedBack = require('../models/User/feedback.model')
 const AuditLogSystem = require('../common/audit.log');
 const EmailCommon = require("../common/email.constaint");
 const mailer = require('../utils/mailer');
