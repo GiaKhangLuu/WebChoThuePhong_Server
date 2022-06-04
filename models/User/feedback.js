@@ -1,28 +1,34 @@
 var mongoose = require('mongoose');
-var today = new Date();
-var FeebBackSchema = new mongoose.Schema(
-    {
-        iduser:{
-            type:String,
-            required:true
-        },
-        titelfeedback:{
-            type:String,
-            required:true
-        },
-        contentfeedback:{
-            type:String,
-            required:true
-        },
-        timefeedback:{
-            type:Date,
-            default:today
-        }
-      
-    },{
-        versionKey:false
-    }
-);
+var Schema = mongoose.Schema;
+var AuditLogSchema = require('../audit.log.model')
 
-var FeebBack= mongoose.model('FeebBack',FeebBackSchema,'FeedBack')
-module.exports=FeebBack;
+function FeebBackSchema(add) {
+    var schema = new Schema(
+        {
+            iduser: {
+                type: String,
+                required: true
+            },
+            titelfeedback: {
+                type: String,
+                required: true
+            },
+            contentfeedback: {
+                type: String,
+                required: true
+            },
+            timefeedback: {
+                type: Date,
+                default: today
+            }
+
+        }
+    );
+    if (add) {
+        schema.add(add);
+    }
+    return schema;
+}
+
+var feedBackSchema = FeebBackSchema(AuditLogSchema.paths);
+module.exports = mongoose.model('FeedBack', feedBackSchema, 'FeedBack')
