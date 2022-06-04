@@ -21,6 +21,7 @@ var homeRouter = require("./routers/phongtro.router");
 var homePageRouter = require("./routers/home.router");
 var adminNewRouter = require("./routers/Admin/admin.new.router")
 var messageRouter = require('./routers/Messages/message.router')
+var feedbackRouter = require('./routers/feedback.router')
 const handle_socketio = require("./socketio/handle_socketio")
 
 
@@ -76,6 +77,7 @@ app.use("/phong-tro", homeRouter);
 app.use("/trang-chu", homePageRouter);
 app.use("/admin", adminNewRouter);
 app.use('/tin-nhan', messageRouter)
+app.use('/feedback', feedbackRouter)
 
 const PORT = process.env.PORT || 5000;
 

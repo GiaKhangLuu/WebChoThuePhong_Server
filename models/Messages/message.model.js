@@ -96,6 +96,20 @@ module.exports.FindMessageByTime = async (room_id, time) => {
     }
 }
 
+module.exports.FindMessageById = async (room_id, sender_id) => {
+    try {
+        const messages = await Message.aggregate([
+            { $match: { $and: [ { id_room: room_id },
+                                { id_sender: sender_id.toString() } ] } }
+        ])
+
+        return messages
+
+    } catch(err) {
+
+    }
+}
+
 module.exports.GetUnreadMessageInRoom = async (room_ids) => {
     if (room_ids.length == 0) {
         return []
@@ -121,15 +135,6 @@ module.exports.GetUnreadMessageInRoom = async (room_ids) => {
 
 const SeenMessage = async (user_id, messages) => {
     try {
-        /*
-        var messages = await Message.update(
-            { id_room: mongoose.Types.ObjectId(room_id) },
-            { status: 1 },
-            { multi: true }
-        )
-        //return messages
-        */
-
         for (var message of messages) {
             if(message.id_sender != user_id && message.status == 0) {
                 var new_message = await Message.findByIdAndUpdate(
