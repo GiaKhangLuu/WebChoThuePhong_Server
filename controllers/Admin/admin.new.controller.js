@@ -50,13 +50,6 @@ module.exports.AcceptNews = async (req, res) => {
   let news_id = req.body._id;
   var token = decoded(req);
 
-  if (reason == null || reason == undefined) {
-    return res.status(400).json({
-      success: true,
-      message: "Lý do từ chối không được bỏ trống",
-      data: news_id
-    })
-  }
   var news = await News.findOne({ _id: news_id });
   if (news == null) {
     return res.status(404).json({
