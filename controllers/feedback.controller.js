@@ -115,3 +115,30 @@ module.exports.SendFeedback = async (req, res) => {
         })
     }
 }
+
+module.exports.GetFeedBack = async (req, res) => {
+    const feedback_receiver = req.body.feedback_receiver
+    const feedback_sender = req.body.feedback_sender
+    try {
+        const feedbacks = await FeedBack.aggregate([
+            {
+                $match: {
+                    $and: [{ feedback_sender: mongoose.Types.ObjectId(feedback_sender) },
+                    { feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) }]
+                }
+            }
+        ])
+
+        res.json({
+            success: true,
+            data: feedbacks
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            success: false,
+            data: null
+        })
+    }
+}
