@@ -14,14 +14,14 @@ module.exports.ShowFeedBackReceiver = async (req, res) => {
 
         for (var room of rooms) {
             var room_id = room.room_info._id
-            var room_members = room.room_info.members            
+            var room_members = room.room_info.members
 
             if (room_members.length == 0) {
-                res.json({
+                return res.status(400).json({
                     success: false,
                     data: null
                 })
-                return
+
             }
 
             var room_member = room_members[0]
@@ -31,17 +31,19 @@ module.exports.ShowFeedBackReceiver = async (req, res) => {
             var messages_from_member = await Message.FindMessageById(room_id, member_id)
             var own_messages = await Message.FindMessageById(room_id, user_id)
             if (messages_from_member.length >= 1 && own_messages.length >= 1) {
-                rs.push({ "room_id": room_id,
-                          "room_member": room_member,})
+                rs.push({
+                    "room_id": room_id,
+                    "room_member": room_member,
+                })
             }
         }
 
         res.json({
             success: true,
-            data: rs 
+            data: rs
         })
 
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         return null
     }
@@ -65,9 +67,13 @@ const create_feedback = async (feedback_sender, feedback_receiver, content,
 const update_feedback = async (feedback_id, content, rate) => {
     var feedback = await FeedBack.findByIdAndUpdate(
         feedback_id,
-        { $set: { content_feedback: content, 
-                  rate: rate,
-                  time_feedback: new Date() } }
+        {
+            $set: {
+                content_feedback: content,
+                rate: rate,
+                time_feedback: new Date()
+            }
+        }
     )
     return feedback
 }
@@ -79,14 +85,18 @@ module.exports.SendFeedback = async (req, res) => {
     const rate = req.body.rate
     try {
         const feedbacks = await FeedBack.aggregate([
-            { $match: { $and: [ { feedback_sender: mongoose.Types.ObjectId(feedback_sender)},
-                                { feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) } ] } }
+            {
+                $match: {
+                    $and: [{ feedback_sender: mongoose.Types.ObjectId(feedback_sender) },
+                    { feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) }]
+                }
+            }
         ])
 
         var feedback
         if (feedbacks.length == 0) {
             feedback = await create_feedback(feedback_sender, feedback_receiver,
-                content, rate) 
+                content, rate)
         } else {
             var feedback_id = feedbacks[0]._id
             feedback = await update_feedback(feedback_id, content, rate)
@@ -97,7 +107,7 @@ module.exports.SendFeedback = async (req, res) => {
             data: feedback
         })
 
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         res.json({
             success: false,
