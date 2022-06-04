@@ -81,7 +81,7 @@ const update_feedback = async (feedback_id, content, rate) => {
 module.exports.SendFeedback = async (req, res) => {
     const feedback_receiver = req.body.feedback_receiver
     const feedback_sender = req.body.feedback_sender
-    const content = req.body.content
+    const content_feedback = req.body.content_feedback
     const rate = req.body.rate
     try {
         const feedbacks = await FeedBack.aggregate([
@@ -96,10 +96,10 @@ module.exports.SendFeedback = async (req, res) => {
         var feedback
         if (feedbacks.length == 0) {
             feedback = await create_feedback(feedback_sender, feedback_receiver,
-                content, rate)
+                content_feedback, rate)
         } else {
             var feedback_id = feedbacks[0]._id
-            feedback = await update_feedback(feedback_id, content, rate)
+            feedback = await update_feedback(feedback_id, content_feedback, rate)
         }
 
         res.json({
@@ -125,6 +125,31 @@ module.exports.GetFeedBack = async (req, res) => {
                 $match: {
                     $and: [{ feedback_sender: mongoose.Types.ObjectId(feedback_sender) },
                     { feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) }]
+                }
+            }
+        ])
+
+        res.json({
+            success: true,
+            data: feedbacks
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            success: false,
+            data: null
+        })
+    }
+}
+
+module.exports.GetFeedBackFromUser = async (req, res) => {
+    const feedback_receiver = req.body.feedback_receiver
+    try {
+        const feedbacks = await FeedBack.aggregate([
+            {
+                $match: {
+                     feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) 
                 }
             }
         ])
