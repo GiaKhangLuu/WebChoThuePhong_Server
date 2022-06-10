@@ -5,6 +5,7 @@ var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
 var User = require('../models/User/user.model');
 var FeedBack = require('../models/User/feedback.model')
+var Role = require('../common/role');
 const isBase64 = require('is-base64');
 const cloudinary = require('cloudinary').v2;
 module.exports.News_All = async (req, res) => {
@@ -241,7 +242,7 @@ module.exports.ProfileOrtherUser = async (req, res) => {
     var idUser = req.params.id;
 
     var user = await User.findOne(
-        { _id: idUser },
+        { "_id": idUser, "role": { $ne: Role.ADMIN } },
         {
             infor: "$infor",
             local:
