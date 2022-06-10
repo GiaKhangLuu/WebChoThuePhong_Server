@@ -99,8 +99,8 @@ module.exports.GetNameDictrict = async (req, res) => {
 }
 module.exports.NewsNears = async (req, res) => {
     try {
-        const { city, typehome } = req.body;
-        await News.find({ "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
+        const { idNews, city, typehome } = req.body;
+        await News.find({ "_id": { $ne: idNews }, "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
             if (err) return res.status(400).json({
                 success: false,
                 meesage: MessageRes.NEWS_NOT_FOUND
