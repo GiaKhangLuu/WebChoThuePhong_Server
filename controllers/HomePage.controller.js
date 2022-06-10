@@ -3,6 +3,8 @@ var News = require('../models/News/news.model');
 var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
+var User = require('../models/User/user.model');
+var FeedBack = require('../models/User/feedback.model')
 const isBase64 = require('is-base64');
 const cloudinary = require('cloudinary').v2;
 module.exports.News_All = async (req, res) => {
@@ -232,6 +234,44 @@ module.exports.NewsFilter = async (req, res) => {
             message: MessageRes.INTERVAL_SERVER
         })
     }
+}
+
+module.exports.ProfileOrtherUser = async (req, res) => {
+
+    var idUser = req.params.id;
+
+    var user = await User.findOne(
+        { _id: idUser },
+        {
+            infor: "$infor",
+            local:
+            {
+                username: "$local.username",
+                email: "$local.email"
+            },
+            address: "$address",
+            role: "$role",
+            number_phone: "$number_phone",
+        }
+    )
+
+    if (!user) {
+        return res.status(404).json({
+            result: false,
+            message: MessageRes.USERNAME_NOT_FOUND,
+            data: null,
+        })
+    }
+
+    var feedback = await FeedBack.find({ iduser: idUser });
+    var news = await News.find({ "infor.iduser": idUser, "infor.status_news": StatusNews.ACCEPTED });
+
+    return res.status(200).json({
+        result: true,
+        message: MessageRes.INF_SUCCESSFULLY,
+        data: { user, feedback, news },
+    })
+
 }
 
 module.exports.ReportNews = async (req, res) => {
