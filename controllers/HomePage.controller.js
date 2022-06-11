@@ -7,6 +7,7 @@ var AuditLogSystem = require('../common/audit.log');
 var User = require('../models/User/user.model');
 const mailer = require('../utils/mailer');
 var FeedBack = require('../models/User/feedback.model')
+var jwt = require("jsonwebtoken");
 var Role = require('../common/role');
 const isBase64 = require('is-base64');
 const cloudinary = require('cloudinary').v2;

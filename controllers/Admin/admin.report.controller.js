@@ -3,7 +3,7 @@ const status_news = require('../../common/status.news');
 var AuditLogSystem = require('../../common/audit.log');
 var ReportNews = require('../../models/News/report.model');
 
-
+var jwt = require("jsonwebtoken");
 
 module.exports.LoadReportNewsPending = async (req, res) => {
     var listReport = await ReportNews.find({ "status": status_news.PENDING })
