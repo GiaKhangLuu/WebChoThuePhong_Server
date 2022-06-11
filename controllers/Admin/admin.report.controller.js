@@ -58,10 +58,11 @@ module.exports.DetailReportNews = async (req, res) => {
 
 module.exports.DenyReportNews = async (req, res) => {
     var idReport = req.params.id;
+    var token = decoded(req);
     try {
-        var token = decoded(req);
-        var report = await Report.findOne({ "_id": idReport, "status": status_news.PENDING });
 
+        var report = await ReportNews.findOne({ "_id": idReport, "status": status_news.PENDING });
+        console.log(report);
         if (!report) {
             return res.status(404).json({
                 data: detailReport,
