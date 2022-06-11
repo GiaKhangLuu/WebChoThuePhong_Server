@@ -5,23 +5,21 @@ var today = new Date();
 function FeebBackSchema(add) {
     var schema = new Schema(
         {
-            iduser: {
+            feedback_sender: {
+                type: String,
+                required: true,
+            },
+            feedback_receiver: {
+                type: String,
+                required: true,
+            },
+            content_feedback: {
                 type: String,
                 required: true
             },
-            titelfeedback: {
-                type: String,
-                required: true
-            },
-            contentfeedback: {
-                type: String,
-                required: true
-            },
-            timefeedback: {
-                type: Date,
-                default: today
+            rate: {
+                type: Number
             }
-
         }
     );
     if (add) {
