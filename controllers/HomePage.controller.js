@@ -34,25 +34,25 @@ module.exports.News_Special = async (req, res) => {
     var token = decoded(req);
     try {
         if (token == null) {
-            await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, products) => {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, news) => {
                 if (err) return res.status(400).json({ result: false, message: err })
                 return res.status(200).json({
                     result: true,
                     message: MessageRes.INF_SUCCESSFULLY,
-                    data: products
+                    data: news
                 })
             })
         }
         else {
 
-            var products = await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8);
-            for (let i = 0; i < products.length; i++) {
-                var wishList = await WishList.findOne({ "idnews": products[i]._id });
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
                 if (wishList) {
-                    products[i].set("isWishList", true, { strict: false });
+                    news[i].set("isWishList", true, { strict: false });
                 }
                 else {
-                    products[i].set("isWishList", false, { strict: false });
+                    news[i].set("isWishList", false, { strict: false });
                 }
 
             }
@@ -60,7 +60,7 @@ module.exports.News_Special = async (req, res) => {
             return res.status(200).json({
                 result: true,
                 message: MessageRes.INF_SUCCESSFULLY,
-                data: products
+                data: news
             })
 
         }
@@ -129,21 +129,45 @@ module.exports.GetNameDictrict = async (req, res) => {
     }
 }
 module.exports.NewsNears = async (req, res) => {
+    var token = decoded(req);
     try {
         const { idNews, city, typehome } = req.body;
-        await News.find({ "_id": { $ne: idNews }, "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
-            if (err) return res.status(400).json({
-                success: false,
-                meesage: MessageRes.NEWS_NOT_FOUND
-            });
-            else {
-                return res.status(200).json({
-                    success: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
-                })
+        if (token == null) {
+            await News.find({ "_id": { $ne: idNews }, "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
+                if (err) return res.status(400).json({
+                    success: false,
+                    meesage: MessageRes.NEWS_NOT_FOUND
+                });
+                else {
+                    return res.status(200).json({
+                        success: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
+                }
+            })
+        }
+        else {
+            var news = await News.find({ "_id": { $ne: idNews }, "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
             }
-        })
+
+            return res.status(200).json({
+                success: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
+            })
+
+        }
+
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -153,16 +177,38 @@ module.exports.NewsNears = async (req, res) => {
 }
 
 module.exports.News_RoomHome = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6).exec(
-            (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6).exec(
+                (err, result) => {
+                    if (err) console.log(err);
+                    res.json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
                 })
+        }
+        else {
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
     } catch (err) {
         res.json({
             result: false,
@@ -171,16 +217,39 @@ module.exports.News_RoomHome = async (req, res) => {
     }
 }
 module.exports.News_HouseHome = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6).exec(
-            (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6).exec(
+                (err, result) => {
+                    if (err) console.log(err);
+                    res.json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
                 })
+        }
+        else {
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
+
     } catch (err) {
         res.json({
             result: false,
@@ -189,16 +258,37 @@ module.exports.News_HouseHome = async (req, res) => {
     }
 }
 module.exports.News_ApartmentHome = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6).exec(
-            (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6).exec(
+                (err, result) => {
+                    if (err) console.log(err);
+                    res.json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
                 })
+        } else {
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
     } catch (err) {
         res.json({
             result: false,
@@ -207,7 +297,7 @@ module.exports.News_ApartmentHome = async (req, res) => {
     }
 }
 module.exports.NewsFilter = async (req, res) => {
-
+    var token = decoded(req);
     try {
 
         var { city, district, street, typeHome, priceMin, priceMax, acreageMin, acreageMax } = req.body;
@@ -242,22 +332,42 @@ module.exports.NewsFilter = async (req, res) => {
         if (acreageMin != null && acreageMax != null) {
             query["infor.acreage"] = { $gte: acreageMin, $lte: acreageMax };
         }
-
-        await News.find(query).exec(
-            (err, result) => {
-                console.log(result);
-                if (err) {
-                    return res.status(400).json({
-                        result: false,
-                        message: err ? err : MessageRes.INTERVAL_SERVER
+        if (token == null) {
+            await News.find(query).exec(
+                (err, result) => {
+                    console.log(result);
+                    if (err) {
+                        return res.status(400).json({
+                            result: false,
+                            message: err ? err : MessageRes.INTERVAL_SERVER
+                        })
+                    }
+                    return res.status(200).json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
                     })
-                }
-                return res.status(200).json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
                 })
+        }
+        else {
+            var news = await News.find(query);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
 
     } catch (err) {
         return res.status(500).json({
