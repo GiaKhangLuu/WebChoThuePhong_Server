@@ -4,6 +4,7 @@ var AuditLogSystem = require('../../common/audit.log');
 var ReportNews = require('../../models/News/report.model');
 var News = require('../../models/News/news.model');
 var MessageRes = require('../../common/message.res');
+var User = require('../../models/User/user.model');
 const mailer = require('../../utils/mailer');
 const EmailCommon = require("../../common/email.constaint");
 var jwt = require("jsonwebtoken");
@@ -37,7 +38,7 @@ module.exports.DetailReportNews = async (req, res) => {
     var idReportNews = req.params.id;
 
     var detailReport = await ReportNews.findOne({ "_id": idReportNews });
-    var news = await News.findOne({ "_id": detailReport.idNews, "infor.status_news": status_news.ACCEPTED });
+    var news = await User.findOne({ "_id": detailReport.idNews, "infor.status_news": status_news.ACCEPTED });
     if (news) {
         detailReport.set("news", news, { strict: false });
     }
@@ -62,7 +63,7 @@ module.exports.DenyReportNews = async (req, res) => {
     try {
 
         var report = await ReportNews.findOne({ "_id": idReport, "status": status_news.PENDING });
-        console.log(report);
+
         if (!report) {
             return res.status(404).json({
                 data: detailReport,
@@ -74,8 +75,10 @@ module.exports.DenyReportNews = async (req, res) => {
         report.status = status_news.DENIED;
         report = AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, report);
 
-        var user = await News.findOne({ "idReporter": report.idReporter });
+        var user = await User.findOne({ "_id": report.idReporter });
+
         await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_FAILED_NEWS_TEMPLATE);
+        console.log(user);
         await report.save();
 
     } catch {
@@ -103,7 +106,7 @@ module.exports.ConfirmReportNews = async (req, res) => {
         report.status = status_news.ACCEPTED;
         report = AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, report);
 
-        var user = await News.findOne({ "idReporter": report.idReporter });
+        var user = await News.findOne({ "_id": report.idReporter });
         var news = await News.findOne({ _id: report.idNews });
         if (!news) {
             return res.status(404).json({
