@@ -307,12 +307,6 @@ module.exports.ReportNews = async (req, res) => {
     }
 
 
-    if (!isValidEmail(emailReporter)) {
-        return res.status(400).json({
-            result: false,
-            message: MessageRes.EMAIL_INCORRECT_FORMAT
-        })
-    }
 
     var newReport = new ReportNews({
         idNews,
@@ -350,12 +344,6 @@ var CheckBase64Image = (str) => {
         return false;
     }
 }
-
-var isValidEmail = function (email) {
-    const pattern = "^(\\s+)?\\w+([-+.']\\w+)*@[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*\\.[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*(\\s+)?$";
-    return email.match(pattern);
-}
-
 var decoded = function (req) {
     const authHeader = req.header('Authorization');
     const token = authHeader && authHeader.split(' ')[1];

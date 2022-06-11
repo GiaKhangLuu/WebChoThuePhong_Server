@@ -70,6 +70,15 @@ module.exports.ConfirmReportNews = async (req, res) => {
             data: news_id
         })
     }
+    news.infor.status_news = status_news.DENIED;
+    news.reason = reason;
+    AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, news)
+    await news.save();
+    return res.status(200).json({
+        success: true,
+        message: messageRes.UPDATE_SUCCESSFULLY,
+        data: news_id
+    })
 
 
 }
