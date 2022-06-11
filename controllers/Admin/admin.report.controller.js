@@ -63,23 +63,26 @@ module.exports.DenyReportNews = async (req, res) => {
     try {
 
         var report = await ReportNews.findOne({ "_id": idReport, "status": status_news.PENDING });
-
         if (!report) {
             return res.status(404).json({
-                data: detailReport,
-                message: messageRes.INF_SUCCESSFULLY,
+                data: null,
+                message: messageRes.REPORTS_NOT_FOUND,
                 result: false
             })
         }
 
         report.status = status_news.DENIED;
         report = AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, report);
-
         var user = await User.findOne({ "_id": report.idReporter });
 
         await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_FAILED_NEWS_TEMPLATE);
-        console.log(user);
+
         await report.save();
+
+        return res.status(200).json({
+            result: true,
+            message: MessageRes.INF_SUCCESSFULLY
+        })
 
     } catch {
         return res.status(500).json({
@@ -97,8 +100,8 @@ module.exports.ConfirmReportNews = async (req, res) => {
 
         if (!report) {
             return res.status(404).json({
-                data: detailReport,
-                message: messageRes.INF_SUCCESSFULLY,
+                data: null,
+                message: messageRes.REPORTS_NOT_FOUND,
                 result: false
             })
         }
