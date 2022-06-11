@@ -26,6 +26,9 @@ router.get("/thong-tin/:id", controller.getInforUserById);
 router.get("/chinh-sua-thong-tin", authorize([role.CHUNHATRO, role.MEMBER]), controller.getInforUserEdit);
 router.post("/chinh-sua-thong-tin/anh-dai-dien", authorize([role.CHUNHATRO, role.MEMBER]), controller.UploadUserEditAvatar);
 router.post("/chinh-sua-thong-tin", controller.EditedInforUser);
+router.post("/yeu-thich-tin/:id", controller.WishList);
 
+router.get('/tin-yeu-thich', controller.GetAllWishList);
+router.get('/tin-yeu-thich/:id', controller.GetDetailWishList);
 
 module.exports = router;

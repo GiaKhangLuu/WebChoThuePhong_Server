@@ -13,9 +13,14 @@ module.exports = {
     IMG_IS_NOT_VALID: "Hình ảnh không đúng định dạng base64",
     IMG_AND_CONTENT_IS_REQUIRED: "Hình ảnh và nội dung báo cáo không được trống cùng một lúc",
     REPORTS_NOT_FOUND: "Không tìm thấy danh sách báo cáo",
+    WISH_LIST_ADD_FAILED: "Yêu thích thất bại",
+    WISH_LIST_NOT_FOUND: "Không tìm thấy tin yêu thích",
+    REPORT_FAILED: "Bạn đã báo cáo rồi,vui lòng chờ xác nhận",
     //RESULT SUCCESSFULLY
     REGISTER_SUCCESSFULLY: "Đăng ký thành công",
     LOGIN_SUCCESSFULLY: "Đăng nhập thành công",
     INF_SUCCESSFULLY: "Thành công",
     UPDATE_SUCCESSFULLY: "Cập nhật thành công",
+    WISH_LIST_ADD_SUCCESSFULLY: "Yêu thích thành công",
+    WISH_LIST_REMOVE_SUCCESSFULLY: "Hủy Yêu thích thành công",
 }

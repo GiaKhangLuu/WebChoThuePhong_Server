@@ -4,6 +4,7 @@ var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
 var User = require('../models/User/user.model');
+const mailer = require('../utils/mailer');
 var FeedBack = require('../models/User/feedback.model')
 var Role = require('../common/role');
 const isBase64 = require('is-base64');
@@ -277,8 +278,17 @@ module.exports.ProfileOrtherUser = async (req, res) => {
 
 module.exports.ReportNews = async (req, res) => {
 
-    var { idNews, title, image, content, emailReporter } = req.body;
+    var token = decoded(req);
+    var { idNews, title, image, content } = req.body;
 
+    var limitReportInDay = await ReportNews.find({ "idReporter": token.UserId, "idNews": idNews, "status": StatusNews.PENDING });
+
+    if (limitReportInDay.length >= 2) {
+        return res.status(400).json({
+            result: false,
+            message: MessageRes.REPORT_FAILED
+        })
+    }
     var news = await News.findOne({ "_id": idNews, "infor.status_news": StatusNews.ACCEPTED });
     if (!news) {
         return res.status(404).json({
@@ -304,9 +314,9 @@ module.exports.ReportNews = async (req, res) => {
 
     var newReport = new ReportNews({
         idNews,
+        idReporter: token.UserId,
         title,
         content,
-        emailReporter,
         status: StatusNews.PENDING
     });
 
@@ -321,7 +331,7 @@ module.exports.ReportNews = async (req, res) => {
         newReport.image[i] = imageInfoResult.url;
     }
     await newReport.save();
-
+    await mailer.sendMail(email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
 
     return res.status(200).json({
         result: true,
@@ -341,4 +351,10 @@ var CheckBase64Image = (str) => {
 var isValidEmail = function (email) {
     const pattern = "^(\\s+)?\\w+([-+.']\\w+)*@[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*\\.[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*(\\s+)?$";
     return email.match(pattern);
+}
+
+var decoded = function (req) {
+    const authHeader = req.header('Authorization');
+    const token = authHeader && authHeader.split(' ')[1];
+    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 }

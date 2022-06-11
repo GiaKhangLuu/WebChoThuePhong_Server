@@ -46,6 +46,7 @@ module.exports.DetailReportNews = async (req, res) => {
 
 module.exports.ConfirmReportNews = async (req, res) => {
 
+
 }
 
 

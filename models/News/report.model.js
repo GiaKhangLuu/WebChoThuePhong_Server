@@ -9,6 +9,10 @@ function ReportSchema(add) {
                 ref: 'News',
                 required: true,
             },
+            idReporter: {
+                type: String,
+                required: true
+            },
             title: {
                 type: String,
                 required: true
@@ -19,10 +23,6 @@ function ReportSchema(add) {
             image: [{
                 type: String
             }],
-            emailReporter: {
-                type: String,
-                required: true
-            },
             status: {
                 type: String
             }
