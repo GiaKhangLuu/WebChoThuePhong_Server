@@ -4,6 +4,7 @@ var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
 var AuditLogSystem = require('../common/audit.log');
+const EmailCommon = require("../common/email.constaint");
 var User = require('../models/User/user.model');
 const mailer = require('../utils/mailer');
 var FeedBack = require('../models/User/feedback.model')
