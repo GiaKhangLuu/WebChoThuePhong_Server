@@ -45,10 +45,31 @@ module.exports.DetailReportNews = async (req, res) => {
 
 
 module.exports.ConfirmReportNews = async (req, res) => {
-    var idReport = req.params.id;
+    var { idReport, reason } = req.body;
 
-    var report = await Report.findOne({ "_id": idReport });
+    var token = decoded(req);
+    var report = await Report.findOne({ "_id": idReport, "status": status_news.PENDING });
 
+    if (!report) {
+        return res.status(404).json({
+            data: detailReport,
+            message: messageRes.INF_SUCCESSFULLY,
+            result: false
+        })
+    }
+
+    report.status = status_news.ACCEPTED;
+    report = AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, report);
+    await report.save();
+
+    var news = await News.findOne({ _id: report.idNews });
+    if (!news) {
+        return res.status(404).json({
+            success: true,
+            message: messageRes.NEWS_NOT_FOUND,
+            data: news_id
+        })
+    }
 
 
 }

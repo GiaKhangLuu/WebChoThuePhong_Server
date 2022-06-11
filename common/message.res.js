@@ -16,6 +16,7 @@ module.exports = {
     WISH_LIST_ADD_FAILED: "Yêu thích thất bại",
     WISH_LIST_NOT_FOUND: "Không tìm thấy tin yêu thích",
     REPORT_FAILED: "Bạn đã báo cáo rồi,vui lòng chờ xác nhận",
+    REPORT_NOT_FOUND: "Báo cáo không tồn tại",
     //RESULT SUCCESSFULLY
     REGISTER_SUCCESSFULLY: "Đăng ký thành công",
     LOGIN_SUCCESSFULLY: "Đăng nhập thành công",

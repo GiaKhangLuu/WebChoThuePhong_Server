@@ -3,6 +3,7 @@ var News = require('../models/News/news.model');
 var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
+var AuditLogSystem = require('../common/audit.log');
 var User = require('../models/User/user.model');
 const mailer = require('../utils/mailer');
 var FeedBack = require('../models/User/feedback.model')
@@ -330,6 +331,7 @@ module.exports.ReportNews = async (req, res) => {
         var imageInfoResult = await cloudinary.uploader.upload(image[i]);
         newReport.image[i] = imageInfoResult.url;
     }
+    newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
     await newReport.save();
     await mailer.sendMail(email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
 
