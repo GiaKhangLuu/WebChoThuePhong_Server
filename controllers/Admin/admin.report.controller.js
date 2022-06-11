@@ -45,6 +45,10 @@ module.exports.DetailReportNews = async (req, res) => {
 
 
 module.exports.ConfirmReportNews = async (req, res) => {
+    var idReport = req.params.id;
+
+    var report = await Report.findOne({ "_id": idReport });
+
 
 
 }

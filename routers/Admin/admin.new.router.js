@@ -15,8 +15,8 @@ router.post("/tu-choi-tin-tuc", authorize(role.ADMIN), controller.DenyNews)
 
 
 //report
-router.get("/danh-sach-bao-cao", reportController);
-router.get("/chi-tiet-bao-cao/:id", reportController)
+router.get("/danh-sach-bao-cao", authorize(role.ADMIN), reportController.LoadReportNewsPending);
+router.get("/chi-tiet-bao-cao/:id", authorize(role.ADMIN), reportController.DetailReportNews);
 
 //login
 router.post('/dang-nhap', loginController.login);
