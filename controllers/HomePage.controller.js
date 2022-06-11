@@ -3,6 +3,7 @@ var News = require('../models/News/news.model');
 var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
+var WishList = require('../models/News//wishlist.model');
 var AuditLogSystem = require('../common/audit.log');
 const EmailCommon = require("../common/email.constaint");
 var User = require('../models/User/user.model');
@@ -30,15 +31,40 @@ module.exports.News_All = async (req, res) => {
 }
 
 module.exports.News_Special = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, products) => {
-            if (err) return res.status(400).json({ result: false, message: err })
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, products) => {
+                if (err) return res.status(400).json({ result: false, message: err })
+                return res.status(200).json({
+                    result: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: products
+                })
+            })
+        }
+        else {
+
+            var products = await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8);
+            for (let i = 0; i < products.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": products[i]._id });
+                if (wishList) {
+                    products[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    products[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
             return res.status(200).json({
                 result: true,
                 message: MessageRes.INF_SUCCESSFULLY,
                 data: products
             })
-        })
+
+        }
+
     }
     catch {
         return res.status(500).json({
@@ -354,7 +380,12 @@ var CheckBase64Image = (str) => {
     }
 }
 var decoded = function (req) {
-    const authHeader = req.header('Authorization');
-    const token = authHeader && authHeader.split(' ')[1];
-    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    try {
+        const authHeader = req.header('Authorization');
+        const token = authHeader && authHeader.split(' ')[1];
+        return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    }
+    catch {
+        return null;
+    }
 }
