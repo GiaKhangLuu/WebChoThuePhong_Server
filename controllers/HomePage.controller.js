@@ -283,58 +283,66 @@ module.exports.ReportNews = async (req, res) => {
 
     var token = decoded(req);
     var { idNews, title, image, content } = req.body;
+    try {
+        var limitReportInDay = await ReportNews.find({ "idReporter": token.UserId, "idNews": idNews, "status": StatusNews.PENDING });
 
-    var limitReportInDay = await ReportNews.find({ "idReporter": token.UserId, "idNews": idNews, "status": StatusNews.PENDING });
-
-    if (limitReportInDay.length >= 2) {
-        return res.status(400).json({
-            result: false,
-            message: MessageRes.REPORT_FAILED
-        })
-    }
-    var news = await News.findOne({ "_id": idNews, "infor.status_news": StatusNews.ACCEPTED });
-    if (!news) {
-        return res.status(404).json({
-            result: false,
-            message: MessageRes.NEWS_NOT_FOUND
-        })
-    }
-
-    if ((content == null || content == undefined) && (image == null || image == undefined)) {
-        return res.status(400).json({
-            result: false,
-            message: MessageRes.IMG_AND_CONTENT_IS_REQUIRED
-        })
-    }
-
-    var user = await User.findOne({ "_id": token.UserId });
-
-    var newReport = new ReportNews({
-        idNews,
-        idReporter: token.UserId,
-        title,
-        content,
-        status: StatusNews.PENDING
-    });
-
-    for (let i = 0; i < image.length; i++) {
-        if (!CheckBase64Image(image[i])) {
+        if (limitReportInDay.length >= 2) {
             return res.status(400).json({
                 result: false,
-                message: MessageRes.IMG_IS_NOT_VALID
+                message: MessageRes.REPORT_FAILED
             })
         }
-        var imageInfoResult = await cloudinary.uploader.upload(image[i]);
-        newReport.image[i] = imageInfoResult.url;
-    }
-    newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
-    await newReport.save();
-    await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
+        var news = await News.findOne({ "_id": idNews, "infor.status_news": StatusNews.ACCEPTED });
+        if (!news) {
+            return res.status(404).json({
+                result: false,
+                message: MessageRes.NEWS_NOT_FOUND
+            })
+        }
 
-    return res.status(200).json({
-        result: true,
-        message: MessageRes.INF_SUCCESSFULLY
-    })
+        if ((content == null || content == undefined) && (image == null || image == undefined)) {
+            return res.status(400).json({
+                result: false,
+                message: MessageRes.IMG_AND_CONTENT_IS_REQUIRED
+            })
+        }
+
+        var user = await User.findOne({ "_id": token.UserId });
+
+        var newReport = new ReportNews({
+            idNews,
+            idReporter: token.UserId,
+            title,
+            content,
+            status: StatusNews.PENDING
+        });
+
+        for (let i = 0; i < image.length; i++) {
+            if (!CheckBase64Image(image[i])) {
+                return res.status(400).json({
+                    result: false,
+                    message: MessageRes.IMG_IS_NOT_VALID
+                })
+            }
+            var imageInfoResult = await cloudinary.uploader.upload(image[i]);
+            newReport.image[i] = imageInfoResult.url;
+        }
+        newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
+        await newReport.save();
+        await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
+
+        return res.status(200).json({
+            result: true,
+            message: MessageRes.INF_SUCCESSFULLY
+        })
+    }
+    catch {
+        return res.status(500).json({
+            result: false,
+            message: MessageRes.INTERVAL_SERVER
+        })
+    }
+
 }
 
 var CheckBase64Image = (str) => {
