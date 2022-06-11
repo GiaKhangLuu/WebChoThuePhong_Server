@@ -286,7 +286,7 @@ module.exports.ReportNews = async (req, res) => {
     try {
         var limitReportInDay = await ReportNews.find({ "idReporter": token.UserId, "idNews": idNews, "status": StatusNews.PENDING });
 
-        if (limitReportInDay.length >= 2) {
+        if (limitReportInDay.length >= 1) {
             return res.status(400).json({
                 result: false,
                 message: MessageRes.REPORT_FAILED
@@ -327,10 +327,10 @@ module.exports.ReportNews = async (req, res) => {
             var imageInfoResult = await cloudinary.uploader.upload(image[i]);
             newReport.image[i] = imageInfoResult.url;
         }
+
+        await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
         newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
         await newReport.save();
-        await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
-
         return res.status(200).json({
             result: true,
             message: MessageRes.INF_SUCCESSFULLY
