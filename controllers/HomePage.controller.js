@@ -306,7 +306,7 @@ module.exports.ReportNews = async (req, res) => {
         })
     }
 
-
+    var user = await User.findOne({ "_id": token.UserId });
 
     var newReport = new ReportNews({
         idNews,
@@ -328,7 +328,7 @@ module.exports.ReportNews = async (req, res) => {
     }
     newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
     await newReport.save();
-    await mailer.sendMail(email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
+    await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
 
     return res.status(200).json({
         result: true,
