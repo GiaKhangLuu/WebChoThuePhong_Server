@@ -74,6 +74,7 @@ module.exports.DenyReportNews = async (req, res) => {
         report.status = status_news.DENIED;
         report = AuditLogSystem.SetUpdateInfo(token.UserId, token.UserName, report);
 
+        var user = await News.findOne({ "idReporter": report.idReporter });
         await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_FAILED_NEWS_TEMPLATE);
         await report.save();
 
