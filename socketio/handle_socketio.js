@@ -77,13 +77,18 @@ module.exports.SetSocketName = async (socket, data) => {
 };
 
 const AddUsersToNewRoom = async (io, room_id, receiver_id, sender_id) => {
-  const room = `room: ${room_id}`;
-  const sockets = await io.fetchSockets();
-  sockets.forEach((socket) => {
-    if (socket.name == receiver_id || socket.name == sender_id) {
-      socket.join(room);
-    }
-  });
+  try {
+    const room = `room: ${room_id}`;
+    const sockets = await io.fetchSockets();
+    sockets.forEach((socket) => {
+      if (socket.name == receiver_id || socket.name == sender_id) {
+        socket.join(room);
+      }
+    });
+  } catch {
+    return;
+  }
+
 };
 
 // Image processing
@@ -119,5 +124,5 @@ const HandleMessageImage = async (images) => {
       image_urls.push(image_url);
     }
     return image_urls;
-  } catch (err) {}
+  } catch (err) { }
 };
