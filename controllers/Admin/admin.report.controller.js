@@ -38,7 +38,7 @@ module.exports.DetailReportNews = async (req, res) => {
     var idReportNews = req.params.id;
 
     var detailReport = await ReportNews.findOne({ "_id": idReportNews });
-    var news = await User.findOne({ "_id": detailReport.idNews, "infor.status_news": status_news.ACCEPTED });
+    var news = await News.findOne({ "_id": detailReport.idNews, "infor.status_news": status_news.ACCEPTED });
     if (news) {
         detailReport.set("news", news, { strict: false });
     }
