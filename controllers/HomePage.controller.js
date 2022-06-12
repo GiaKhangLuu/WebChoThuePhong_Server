@@ -297,9 +297,9 @@ module.exports.News_ApartmentHome = async (req, res) => {
     }
 }
 module.exports.NewsFilter = async (req, res) => {
-    var token = decoded(req);
-    try {
 
+    try {
+        var token = decoded(req);
         var { city, district, street, typeHome, priceMin, priceMax, acreageMin, acreageMax } = req.body;
 
         var query = {};
