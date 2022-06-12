@@ -419,9 +419,10 @@ module.exports.ReportNews = async (req, res) => {
 
     var token = decoded(req);
     var { idNews, title, image, content } = req.body;
+
     try {
         var limitReportInDay = await ReportNews.find({ "idReporter": token.UserId, "idNews": idNews, "status": StatusNews.PENDING });
-
+        console.log(limitReportInDay);
         if (limitReportInDay.length >= 1) {
             return res.status(400).json({
                 result: false,
@@ -435,16 +436,13 @@ module.exports.ReportNews = async (req, res) => {
                 message: MessageRes.NEWS_NOT_FOUND
             })
         }
-
-        if ((content == null || content == undefined) && (image == null || image == undefined)) {
+        if (content == null || content == undefined) {
             return res.status(400).json({
                 result: false,
                 message: MessageRes.IMG_AND_CONTENT_IS_REQUIRED
             })
         }
-
         var user = await User.findOne({ "_id": token.UserId });
-
         var newReport = new ReportNews({
             idNews,
             idReporter: token.UserId,
@@ -452,18 +450,18 @@ module.exports.ReportNews = async (req, res) => {
             content,
             status: StatusNews.PENDING
         });
-
-        for (let i = 0; i < image.length; i++) {
-            if (!CheckBase64Image(image[i])) {
-                return res.status(400).json({
-                    result: false,
-                    message: MessageRes.IMG_IS_NOT_VALID
-                })
+        if (image.length > 0) {
+            for (let i = 0; i < image.length; i++) {
+                if (!CheckBase64Image(image[i])) {
+                    return res.status(400).json({
+                        result: false,
+                        message: MessageRes.IMG_IS_NOT_VALID
+                    })
+                }
+                var imageInfoResult = await cloudinary.uploader.upload(image[i]);
+                newReport.image[i] = imageInfoResult.url;
             }
-            var imageInfoResult = await cloudinary.uploader.upload(image[i]);
-            newReport.image[i] = imageInfoResult.url;
         }
-
         await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
         newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
         await newReport.save();
