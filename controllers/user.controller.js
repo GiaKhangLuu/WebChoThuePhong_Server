@@ -516,8 +516,9 @@ module.exports.GetDetailWishList = async (req, res) => {
 }
 
 module.exports.WishList = async (req, res) => {
-    var token = decoded(req);
     var idNews = req.params.id;
+
+    var token = decoded(req);
 
 
 
