@@ -519,6 +519,8 @@ module.exports.WishList = async (req, res) => {
     var token = decoded(req);
     var idNews = req.params.id;
 
+
+
     var news = await News.findOne({ "_id": idNews, "infor.iduser": { $ne: token.UserId }, "infor.status_news": StatusNews.ACCEPTED });
     if (!news) {
         return res.status(404).json({
