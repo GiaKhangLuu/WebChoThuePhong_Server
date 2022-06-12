@@ -131,7 +131,7 @@ module.exports.GetFeedBack = async (req, res) => {
 
         res.json({
             success: true,
-            data: feedbacks
+            data: feedbacks[0]
         })
 
     } catch (err) {
