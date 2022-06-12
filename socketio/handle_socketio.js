@@ -25,9 +25,12 @@ module.exports.ReceiveMessage = async (io, data) => {
     var sender_id = data.IdSender
     var message = data.message
 
+    if (receiver_id == '' || receiver_id == null) {
+        return
+    } 
+
     if (message.images.length == 0 && 
-        message.content == '' &&
-        (receiver_id == '' || receiver_id == null)) {
+        message.content == '') {
         return 
     } else {
         var rooms = await ChatRoom.FindChatRoom(sender_id, receiver_id)
