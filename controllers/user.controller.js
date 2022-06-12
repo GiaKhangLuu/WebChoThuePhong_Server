@@ -7,6 +7,9 @@ const argon2 = require('argon2');
 require('dotenv').config();
 var User = require('../models/User/user.model')
 var FeedBack = require('../models/User/feedback.model')
+var News = require('../models/News/news.model');
+var StatusNews = require('../common/status.news');
+var WishList = require('../models/News/wishlist.model');
 const AuditLogSystem = require('../common/audit.log');
 const EmailCommon = require("../common/email.constaint");
 const mailer = require('../utils/mailer');
@@ -47,7 +50,7 @@ module.exports.login = async (req, res) => {
         const accessToken = jwt.sign(
             { UserId: user._id, UserName: user.local.username, Role: user.role },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "10h" }
+            { expiresIn: "7d" }
         );
         const refreshToken = jwt.sign(
             { UserId: user._id, UserName: user.local.username, Role: user.role },
@@ -472,16 +475,91 @@ module.exports.UploadUserEditAvatar = async (req, res) => {
 
 }
 
-module.exports.OpenAvatarUser = async (req, res) => {
-    let imagename = "public/uploads_user_av/" + req.params.nameimage;
-    await fs.readFile(imagename, (err, ImageData) => {
-        if (err) res.json({
-            result: false,
-            message_err: "Lỗi không thể load ảnh"
-        });
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.end(ImageData);
+module.exports.GetAllWishList = async (req, res) => {
+    var token = decoded(req);
+
+    var wishList = await WishList.find({ "iduser": token.UserId });
+    var listNews = [];
+
+    for (let i = 0; i < wishList.length; i++) {
+        var news = await News.findOne({ "_id": wishList[i].idnews, "infor.status_news": StatusNews.ACCEPTED });
+        listNews.push(news);
+    }
+
+    return res.status(200).json({
+        result: true,
+        message: messageRes.INF_SUCCESSFULLY,
+        data: listNews
     })
+}
+
+module.exports.GetDetailWishList = async (req, res) => {
+    var token = decoded(req);
+    var idWishtList = req.params.id;
+
+    var wishList = await WishList.findOne({ "_id": idWishtList, "iduser": token.UserId });
+
+    if (!wishList) {
+        return res.status(404).json({
+            result: false,
+            message: messageRes.WISH_LIST_NOT_FOUND
+        })
+    }
+
+    var news = await News.findOne({ "_id": wishList.idnews, "infor.status_news": StatusNews.ACCEPTED });
+
+    return res.status(200).json({
+        result: true,
+        message: messageRes.INF_SUCCESSFULLY,
+        data: news
+    })
+}
+
+module.exports.WishList = async (req, res) => {
+    var token = decoded(req);
+    var idNews = req.params.id;
+
+    var news = await News.findOne({ "_id": idNews, "infor.iduser": { $ne: token.UserId }, "infor.status_news": StatusNews.ACCEPTED });
+    if (!news) {
+        return res.status(404).json({
+            result: false,
+            message: messageRes.NEWS_NOT_FOUND
+        })
+    }
+    var wishList = await WishList.findOne({ "idnews": idNews });
+    if (!wishList) {
+
+        var newsWishList = new WishList({
+            iduser: token.UserId,
+            idnews: idNews,
+        })
+        newsWishList = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newsWishList)
+        await newsWishList.save((err) => {
+            if (err) {
+                return res.status(400).json({
+                    message: messageRes.WISH_LIST_ADD_FAILED,
+                    result: false
+                });
+            }
+            else {
+                return res.status(200).json({
+                    result: true,
+                    message: messageRes.WISH_LIST_ADD_SUCCESSFULLY,
+                    data: newsWishList
+                })
+            }
+        })
+
+
+    }
+    else {
+        await wishList.remove({});
+        return res.status(200).json({
+            result: true,
+            message: messageRes.WISH_LIST_REMOVE_SUCCESSFULLY,
+            data: null
+        })
+    }
 }
 
 

@@ -38,7 +38,7 @@ module.exports.ShowFeedBackReceiver = async (req, res) => {
             }
         }
 
-        res.json({
+        return res.status(200).json({
             success: true,
             data: rs
         })
@@ -53,8 +53,8 @@ module.exports.ShowFeedBackReceiver = async (req, res) => {
 const create_feedback = async (feedback_sender, feedback_receiver, content,
     rate) => {
     var feedback = new FeedBack()
-    feedback.feedback_sender = mongoose.Types.ObjectId(feedback_sender)
-    feedback.feedback_receiver = mongoose.Types.ObjectId(feedback_receiver)
+    feedback.feedback_sender = feedback_sender
+    feedback.feedback_receiver = feedback_receiver
     feedback.content_feedback = content
     feedback.rate = rate
     feedback = await FeedBack.create(feedback)
@@ -79,16 +79,13 @@ const update_feedback = async (feedback_id, content, rate) => {
 }
 
 module.exports.SendFeedback = async (req, res) => {
-    const feedback_receiver = req.body.feedback_receiver
-    const feedback_sender = req.body.feedback_sender
-    const content_feedback = req.body.content_feedback
-    const rate = req.body.rate
+    const { feedback_receiver, feedback_sender, content_feedback, rate } = req.body
     try {
         const feedbacks = await FeedBack.aggregate([
             {
                 $match: {
-                    $and: [{ feedback_sender: mongoose.Types.ObjectId(feedback_sender) },
-                    { feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) }]
+                    $and: [{ feedback_sender: feedback_sender },
+                    { feedback_receiver: feedback_receiver }]
                 }
             }
         ])
@@ -102,14 +99,13 @@ module.exports.SendFeedback = async (req, res) => {
             feedback = await update_feedback(feedback_id, content_feedback, rate)
         }
 
-        res.json({
+        return res.status(200).json({
             success: true,
             data: feedback
         })
 
     } catch (err) {
-        console.log(err)
-        res.json({
+        return res.status(400).json({
             success: false,
             data: null
         })
@@ -123,20 +119,19 @@ module.exports.GetFeedBack = async (req, res) => {
         const feedbacks = await FeedBack.aggregate([
             {
                 $match: {
-                    $and: [{ feedback_sender: mongoose.Types.ObjectId(feedback_sender) },
-                    { feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) }]
+                    $and: [{ feedback_sender: feedback_sender },
+                    { feedback_receiver: feedback_receiver }]
                 }
             }
         ])
 
-        res.json({
+        return res.status(200).json({
             success: true,
             data: feedbacks[0]
         })
 
     } catch (err) {
-        console.log(err)
-        res.json({
+        return res.status(400).json({
             success: false,
             data: null
         })
@@ -149,19 +144,18 @@ module.exports.GetFeedBackFromUser = async (req, res) => {
         const feedbacks = await FeedBack.aggregate([
             {
                 $match: {
-                     feedback_receiver: mongoose.Types.ObjectId(feedback_receiver) 
+                    feedback_receiver: feedback_receiver
                 }
             }
         ])
 
-        res.json({
+        return res.status(200).json({
             success: true,
             data: feedbacks
         })
 
     } catch (err) {
-        console.log(err)
-        res.json({
+        return res.status(400).json({
             success: false,
             data: null
         })

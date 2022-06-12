@@ -3,6 +3,14 @@ var News = require('../models/News/news.model');
 var MessageRes = require('../common/message.res');
 var StatusNews = require('../common/status.news');
 var ReportNews = require('../models/News/report.model');
+var WishList = require('../models/News//wishlist.model');
+var AuditLogSystem = require('../common/audit.log');
+const EmailCommon = require("../common/email.constaint");
+var User = require('../models/User/user.model');
+const mailer = require('../utils/mailer');
+var FeedBack = require('../models/User/feedback.model')
+var jwt = require("jsonwebtoken");
+var Role = require('../common/role');
 const isBase64 = require('is-base64');
 const cloudinary = require('cloudinary').v2;
 module.exports.News_All = async (req, res) => {
@@ -23,15 +31,40 @@ module.exports.News_All = async (req, res) => {
 }
 
 module.exports.News_Special = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, products) => {
-            if (err) return res.status(400).json({ result: false, message: err })
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8).exec((err, news) => {
+                if (err) return res.status(400).json({ result: false, message: err })
+                return res.status(200).json({
+                    result: true,
+                    message: MessageRes.INF_SUCCESSFULLY,
+                    data: news
+                })
+            })
+        }
+        else {
+
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED }).limit(8);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
             return res.status(200).json({
                 result: true,
                 message: MessageRes.INF_SUCCESSFULLY,
-                data: products
+                data: news
             })
-        })
+
+        }
+
     }
     catch {
         return res.status(500).json({
@@ -96,21 +129,45 @@ module.exports.GetNameDictrict = async (req, res) => {
     }
 }
 module.exports.NewsNears = async (req, res) => {
+    var token = decoded(req);
     try {
-        const { city, typehome } = req.body;
-        await News.find({ "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
-            if (err) return res.status(400).json({
-                success: false,
-                meesage: MessageRes.NEWS_NOT_FOUND
-            });
-            else {
-                return res.status(200).json({
-                    success: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
-                })
+        const { idNews, city, typehome } = req.body;
+        if (token == null) {
+            await News.find({ "_id": { $ne: idNews }, "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4).exec((err, result) => {
+                if (err) return res.status(400).json({
+                    success: false,
+                    meesage: MessageRes.NEWS_NOT_FOUND
+                });
+                else {
+                    return res.status(200).json({
+                        success: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
+                }
+            })
+        }
+        else {
+            var news = await News.find({ "_id": { $ne: idNews }, "address.city": city, "infor.typehome": typehome, "infor.status_news": StatusNews.ACCEPTED }).limit(4);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
             }
-        })
+
+            return res.status(200).json({
+                success: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
+            })
+
+        }
+
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -120,16 +177,38 @@ module.exports.NewsNears = async (req, res) => {
 }
 
 module.exports.News_RoomHome = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6).exec(
-            (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6).exec(
+                (err, result) => {
+                    if (err) console.log(err);
+                    res.json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
                 })
+        }
+        else {
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 1 }).limit(6);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
     } catch (err) {
         res.json({
             result: false,
@@ -138,16 +217,39 @@ module.exports.News_RoomHome = async (req, res) => {
     }
 }
 module.exports.News_HouseHome = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6).exec(
-            (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6).exec(
+                (err, result) => {
+                    if (err) console.log(err);
+                    res.json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
                 })
+        }
+        else {
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 2 }).limit(6);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
+
     } catch (err) {
         res.json({
             result: false,
@@ -156,16 +258,37 @@ module.exports.News_HouseHome = async (req, res) => {
     }
 }
 module.exports.News_ApartmentHome = async (req, res) => {
+    var token = decoded(req);
     try {
-        await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6).exec(
-            (err, result) => {
-                if (err) console.log(err);
-                res.json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
+        if (token == null) {
+            await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6).exec(
+                (err, result) => {
+                    if (err) console.log(err);
+                    res.json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
+                    })
                 })
+        } else {
+            var news = await News.find({ "infor.status_news": StatusNews.ACCEPTED, "infor.typehome": 3 }).limit(6);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
     } catch (err) {
         res.json({
             result: false,
@@ -174,7 +297,7 @@ module.exports.News_ApartmentHome = async (req, res) => {
     }
 }
 module.exports.NewsFilter = async (req, res) => {
-
+    var token = decoded(req);
     try {
 
         var { city, district, street, typeHome, priceMin, priceMax, acreageMin, acreageMax } = req.body;
@@ -209,22 +332,42 @@ module.exports.NewsFilter = async (req, res) => {
         if (acreageMin != null && acreageMax != null) {
             query["infor.acreage"] = { $gte: acreageMin, $lte: acreageMax };
         }
-
-        await News.find(query).exec(
-            (err, result) => {
-                console.log(result);
-                if (err) {
-                    return res.status(400).json({
-                        result: false,
-                        message: err ? err : MessageRes.INTERVAL_SERVER
+        if (token == null) {
+            await News.find(query).exec(
+                (err, result) => {
+                    console.log(result);
+                    if (err) {
+                        return res.status(400).json({
+                            result: false,
+                            message: err ? err : MessageRes.INTERVAL_SERVER
+                        })
+                    }
+                    return res.status(200).json({
+                        result: true,
+                        message: MessageRes.INF_SUCCESSFULLY,
+                        data: result
                     })
-                }
-                return res.status(200).json({
-                    result: true,
-                    message: MessageRes.INF_SUCCESSFULLY,
-                    data: result
                 })
+        }
+        else {
+            var news = await News.find(query);
+            for (let i = 0; i < news.length; i++) {
+                var wishList = await WishList.findOne({ "idnews": news[i]._id });
+                if (wishList) {
+                    news[i].set("isWishList", true, { strict: false });
+                }
+                else {
+                    news[i].set("isWishList", false, { strict: false });
+                }
+
+            }
+
+            return res.status(200).json({
+                result: true,
+                message: MessageRes.INF_SUCCESSFULLY,
+                data: news
             })
+        }
 
     } catch (err) {
         return res.status(500).json({
@@ -234,58 +377,106 @@ module.exports.NewsFilter = async (req, res) => {
     }
 }
 
-module.exports.ReportNews = async (req, res) => {
+module.exports.ProfileOrtherUser = async (req, res) => {
 
-    var { idNews, title, image, content, emailReporter } = req.body;
+    var idUser = req.params.id;
 
-    var news = await News.findOne({ "_id": idNews, "infor.status_news": StatusNews.ACCEPTED });
-    if (!news) {
+    var user = await User.findOne(
+        { "_id": idUser, "role": { $ne: Role.ADMIN } },
+        {
+            infor: "$infor",
+            local:
+            {
+                username: "$local.username",
+                email: "$local.email"
+            },
+            address: "$address",
+            role: "$role",
+            number_phone: "$number_phone",
+        }
+    )
+
+    if (!user) {
         return res.status(404).json({
             result: false,
-            message: MessageRes.NEWS_NOT_FOUND
+            message: MessageRes.USERNAME_NOT_FOUND,
+            data: null,
         })
     }
 
-    if ((content == null || content == undefined) && (image == null || image == undefined)) {
-        return res.status(400).json({
-            result: false,
-            message: MessageRes.IMG_AND_CONTENT_IS_REQUIRED
-        })
-    }
-
-
-    if (!isValidEmail(emailReporter)) {
-        return res.status(400).json({
-            result: false,
-            message: MessageRes.EMAIL_INCORRECT_FORMAT
-        })
-    }
-
-    var newReport = new ReportNews({
-        idNews,
-        title,
-        content,
-        emailReporter,
-        status: StatusNews.PENDING
-    });
-
-    for (let i = 0; i < image.length; i++) {
-        if (!CheckBase64Image(image[i])) {
-            return res.status(400).json({
-                result: false,
-                message: MessageRes.IMG_IS_NOT_VALID
-            })
-        }
-        var imageInfoResult = await cloudinary.uploader.upload(image[i]);
-        newReport.image[i] = imageInfoResult.url;
-    }
-    await newReport.save();
-
+    var feedback = await FeedBack.find({ iduser: idUser });
+    var news = await News.find({ "infor.iduser": idUser, "infor.status_news": StatusNews.ACCEPTED });
 
     return res.status(200).json({
         result: true,
-        message: MessageRes.INF_SUCCESSFULLY
+        message: MessageRes.INF_SUCCESSFULLY,
+        data: { user, feedback, news },
     })
+
+}
+
+module.exports.ReportNews = async (req, res) => {
+
+    var token = decoded(req);
+    var { idNews, title, image, content } = req.body;
+
+    try {
+        var limitReportInDay = await ReportNews.find({ "idReporter": token.UserId, "idNews": idNews, "status": StatusNews.PENDING });
+        console.log(limitReportInDay);
+        if (limitReportInDay.length >= 1) {
+            return res.status(400).json({
+                result: false,
+                message: MessageRes.REPORT_FAILED
+            })
+        }
+        var news = await News.findOne({ "_id": idNews, "infor.status_news": StatusNews.ACCEPTED });
+        if (!news) {
+            return res.status(404).json({
+                result: false,
+                message: MessageRes.NEWS_NOT_FOUND
+            })
+        }
+        if (content == null || content == undefined) {
+            return res.status(400).json({
+                result: false,
+                message: MessageRes.IMG_AND_CONTENT_IS_REQUIRED
+            })
+        }
+        var user = await User.findOne({ "_id": token.UserId });
+        var newReport = new ReportNews({
+            idNews,
+            idReporter: token.UserId,
+            title,
+            content,
+            status: StatusNews.PENDING
+        });
+        if (image.length > 0) {
+            for (let i = 0; i < image.length; i++) {
+                if (!CheckBase64Image(image[i])) {
+                    return res.status(400).json({
+                        result: false,
+                        message: MessageRes.IMG_IS_NOT_VALID
+                    })
+                }
+                var imageInfoResult = await cloudinary.uploader.upload(image[i]);
+                newReport.image[i] = imageInfoResult.url;
+            }
+        }
+        await mailer.sendMail(user.local.email, EmailCommon.EMAIL_REPORT_NEWS_SUBJECT, EmailCommon.EMAIL_REPORT_NEWS_TEMPLATE);
+        newReport = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, newReport);
+        await newReport.save();
+        return res.status(200).json({
+            result: true,
+            message: MessageRes.INF_SUCCESSFULLY
+        })
+    }
+    catch {
+        return res.status(500).json({
+            result: false,
+            message: MessageRes.INTERVAL_SERVER
+        })
+    }
+
 }
 
 var CheckBase64Image = (str) => {
@@ -296,8 +487,13 @@ var CheckBase64Image = (str) => {
         return false;
     }
 }
-
-var isValidEmail = function (email) {
-    const pattern = "^(\\s+)?\\w+([-+.']\\w+)*@[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*\\.[a-z0-9A-Z]+([-.][a-z0-9A-Z]+)*(\\s+)?$";
-    return email.match(pattern);
+var decoded = function (req) {
+    try {
+        const authHeader = req.header('Authorization');
+        const token = authHeader && authHeader.split(' ')[1];
+        return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    }
+    catch {
+        return null;
+    }
 }
