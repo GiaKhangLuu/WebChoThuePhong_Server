@@ -74,7 +74,7 @@ module.exports.DeleteImageInfor = async (req, res) => {
 module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
 
-    if (IsEnoughNewsHave(token.UserId) >= 3) {
+    if (IsEnoughNewsHave(token.UserId) > 2) {
         console.log(IsEnoughNewsHave(token.UserId));
         return res.status(400).json({
             success: false,
