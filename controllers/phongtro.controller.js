@@ -74,7 +74,7 @@ module.exports.DeleteImageInfor = async (req, res) => {
 module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
     var countNews = IsEnoughNewsHave(token.UserId);
-    consol.log(countNews);
+    console.log(countNews);
     if (countNews >= 3) {
         return res.status(400).json({
             success: false,
