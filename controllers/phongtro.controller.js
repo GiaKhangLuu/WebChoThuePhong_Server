@@ -77,7 +77,7 @@ module.exports.PostNews = async (req, res) => {
 
     if (news.length >= 3) {
         return res.status(400).json({
-            success: false,
+            result: false,
             message: messageRes.LIMIT_NEWS
         })
     }
@@ -89,13 +89,13 @@ module.exports.PostNews = async (req, res) => {
 
     if (user == null) {
         return res.json({
-            success: false,
+            result: false,
             message: messageRes.USERNAME_NOT_FOUND
         })
     }
     if (!isValidPhone(number_phone)) {
         return res.json({
-            success: false,
+            result: false,
             message: messageRes.PHONE_IS_NOT_VALID
         })
     }
