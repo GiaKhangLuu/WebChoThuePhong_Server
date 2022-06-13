@@ -77,7 +77,7 @@ module.exports.PostNews = async (req, res) => {
     if (countNews >= 3) {
         return res.status(400).json({
             success: false,
-            message: messageRes.USERNAME_NOT_FOUND
+            message: LIMIT_NEWS
         })
     }
     let { title, content_infor, number_phone, price, acreage, img_avatar, img_infor,

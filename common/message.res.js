@@ -17,6 +17,7 @@ module.exports = {
     WISH_LIST_NOT_FOUND: "Không tìm thấy tin yêu thích",
     REPORT_FAILED: "Bạn đã báo cáo rồi,vui lòng chờ xác nhận",
     REPORT_NOT_FOUND: "Báo cáo không tồn tại",
+    LIMIT_NEWS: "Số lượng tin đăng bị giới hạn",
     //RESULT SUCCESSFULLY
     REGISTER_SUCCESSFULLY: "Đăng ký thành công",
     LOGIN_SUCCESSFULLY: "Đăng nhập thành công",
