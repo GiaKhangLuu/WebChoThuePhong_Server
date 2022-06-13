@@ -73,9 +73,7 @@ module.exports.DeleteImageInfor = async (req, res) => {
 // Căn hộ
 module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
-    var countNews = IsEnoughNewsHave(token.UserId);
-    console.log(countNews);
-    if (countNews >= 3) {
+    if (IsEnoughNewsHave(token.UserId) >= 3) {
         return res.status(400).json({
             success: false,
             message: LIMIT_NEWS
