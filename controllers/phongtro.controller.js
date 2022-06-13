@@ -78,7 +78,7 @@ module.exports.PostNews = async (req, res) => {
     if (news.length >= 3) {
         return res.status(400).json({
             success: false,
-            message: LIMIT_NEWS
+            message: messageRes.LIMIT_NEWS
         })
     }
     let { title, content_infor, number_phone, price, acreage, img_avatar, img_infor,
