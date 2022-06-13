@@ -102,7 +102,7 @@ module.exports.refreshToken = async (req, res) => {
 //###########__Register__###################
 module.exports.register = async (req, res) => {
     const { username, password, email, firstname, lastname,
-        gender, city, district, street, address_detail } = req.body;
+        city, district, street, address_detail } = req.body;
 
     try {
         var user = await User.findOne({ "local.username": username });
@@ -135,7 +135,7 @@ module.exports.register = async (req, res) => {
             "local.email": email,
             "infor.firstname": firstname,
             "infor.lastname": lastname,
-            "infor.gender": gender,
+            "infor.gender": true,
             "address.city": city,
             "address.district": district,
             "address.street": street,
