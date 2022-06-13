@@ -73,9 +73,9 @@ module.exports.DeleteImageInfor = async (req, res) => {
 // Căn hộ
 module.exports.PostNews = async (req, res) => {
     var token = decoded(req);
+    var news = await News.find({ "infor.status_news": { $ne: status_news.DELETE }, "infor.iduser": token.UserId })
 
-    if (IsEnoughNewsHave(token.UserId) > 2) {
-        console.log(IsEnoughNewsHave(token.UserId));
+    if (news.length >= 3) {
         return res.status(400).json({
             success: false,
             message: LIMIT_NEWS
@@ -399,10 +399,6 @@ module.exports.PostManagerHiddenNews = async (req, res) => {
 }
 
 
-var IsEnoughNewsHave = async (userId) => {
-    var news = await News.find({ "infor.status_news": { $ne: status_news.DELETE }, "infor.iduser": userId })
-    return news.length;
-}
 
 var decoded = function (req) {
     const authHeader = req.header('Authorization');
