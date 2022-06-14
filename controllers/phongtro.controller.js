@@ -176,7 +176,7 @@ module.exports.PostNews = async (req, res) => {
 
 module.exports.DetailNews = async (req, res) => {
     var token = decoded(req);
-    var news = await News.findOne({ "_id": req.params.id, "infor.iduser": token.UserId });
+    var news = await News.findOne({ "_id": req.params.id, "infor.status_news": { $ne: status_news.DELETE }, "infor.iduser": token.UserId });
 
     if (!news) {
         return res.status(404).json({
@@ -312,7 +312,7 @@ module.exports.UpdateNews = async (req, res) => {
 module.exports.PostManagerPT = async (req, res) => {
 
     var token = decoded(req);
-    await News.find({ "infor.iduser": token.UserId, "infor.typehome": 1 }, (err, result) => {
+    await News.find({ "infor.iduser": token.UserId, "infor.status_news": { $ne: status_news.DELETE }, "infor.typehome": 1 }, (err, result) => {
         if (err) {
             return res.status(400).json({
                 success: false,
@@ -331,7 +331,7 @@ module.exports.PostManagerPT = async (req, res) => {
 module.exports.PostManagerNT = async (req, res) => {
 
     var token = decoded(req);
-    await News.find({ "infor.iduser": token.UserId, "infor.typehome": 2 }, (err, result) => {
+    await News.find({ "infor.iduser": token.UserId, "infor.status_news": { $ne: status_news.DELETE }, "infor.typehome": 2 }, (err, result) => {
         if (err) {
             return res.status(400).json({
                 success: false,
@@ -349,7 +349,7 @@ module.exports.PostManagerCH = async (req, res) => {
 
     var token = decoded(req);
     IsEnoughNewsHave(token.UserId);
-    await News.find({ "infor.iduser": token.UserId, "infor.typehome": 3 }, (err, result) => {
+    await News.find({ "infor.iduser": token.UserId, "infor.status_news": { $ne: status_news.DELETE }, "infor.typehome": 3 }, (err, result) => {
         if (err) {
             return res.status(400).json({
                 success: false,
