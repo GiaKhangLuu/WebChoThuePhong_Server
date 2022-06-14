@@ -371,33 +371,37 @@ module.exports.PostManagerHiddenNews = async (req, res) => {
 
     try {
         const token = decoded(req);
-        const news = await News.find({ "_id": req.params.id });
+        const news = await News.findOne({ "_id": req.params.id });
 
         if (news == null) {
             return res.json({
                 message: messageRes.NEWS_NOT_FOUND,
-                success: false,
+                result: true,
             })
         }
 
         if (news.infor.status_news == status_news.DELETE) {
             return res.json({
                 message: messageRes.NEWS_NOT_FOUND,
-                success: false,
+                result: true,
             })
         }
 
         if (news.infor.iduser == decoded.UserId) {
             return res.json({
                 message: messageRes.NEWS_NOT_FOUND,
-                success: false,
+                result: true,
             })
         }
 
         news.infor.status_news = status_news.DELETE;
-        news = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, news);
         await news.save();
 
+
+        return res.status(200).json({
+            message: "Xóa tin rao thành công",
+            result: true,
+        })
     }
     catch (err) {
         return res.status(500).json({
