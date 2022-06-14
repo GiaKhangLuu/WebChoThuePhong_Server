@@ -23,8 +23,7 @@ router.get("/chi-tiet-bai-dang/:id", authorize(role.CHUNHATRO), controller.Detai
 router.get("/quan-ly-tin-dang/phong-tro", authorize(role.CHUNHATRO), controller.PostManagerPT);
 router.get("/quan-ly-tin-dang/nha-tro", authorize(role.CHUNHATRO), controller.PostManagerNT);
 router.get("/quan-ly-tin-dang/can-ho", authorize(role.CHUNHATRO), controller.PostManagerCH);
-router.post("/quan-ly-tin-dang/an-tin-tuc", authorize(role.CHUNHATRO), controller.PostManagerHiddenNews);
-
+router.post("/quan-ly-tin-dang/an-tin-tuc/:id", authorize(role.CHUNHATRO), controller.PostManagerHiddenNews);
 
 
 

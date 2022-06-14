@@ -293,7 +293,7 @@ module.exports.UpdateNews = async (req, res) => {
         if (err) {
             return res.status(400).json({
                 message: "Cập nhật tin thất bại",
-                result: true
+                result: false
             });
         }
         else {
@@ -369,33 +369,42 @@ module.exports.PostManagerCH = async (req, res) => {
 module.exports.PostManagerHiddenNews = async (req, res) => {
 
     const token = decoded(req);
-    const news = await News.find({ "_id": req.body.id });
+    try{
+        const news = await News.find({ "_id": req.params.id });
 
-    if (news == null) {
-        return res.json({
-            message: messageRes.NEWS_NOT_FOUND,
-            success: false,
-        })
+        if (news == null) {
+            return res.json({
+                message: messageRes.NEWS_NOT_FOUND,
+                success: false,
+            })
+        }
+    
+        if (news.infor.status_news == status_news.DELETE) {
+            return res.json({
+                message: messageRes.NEWS_NOT_FOUND,
+                success: false,
+            })
+        }
+    
+        if (news.infor.iduser == decoded.UserId) {
+            return res.json({
+                message: messageRes.NEWS_NOT_FOUND,
+                success: false,
+            })
+        }
+    
+        news.infor.status_news = status_news.DELETE;
+        news = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, news);
+        await news.save();
+    
     }
-
-    if (news.infor.status_news == status_news.DELETE) {
-        return res.json({
-            message: messageRes.NEWS_NOT_FOUND,
-            success: false,
-        })
+    catch (err){
+        return res.status(500).json({
+            message: err,
+            result: false
+        });
     }
-
-    if (news.infor.iduser == decoded.UserId) {
-        return res.json({
-            message: messageRes.NEWS_NOT_FOUND,
-            success: false,
-        })
-    }
-
-    news.infor.status_news = status_news.DELETE;
-    news = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, news);
-    await news.save();
-
+   
 }
 
 
