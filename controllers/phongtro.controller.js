@@ -368,8 +368,9 @@ module.exports.PostManagerCH = async (req, res) => {
 // Ẩn tin tức
 module.exports.PostManagerHiddenNews = async (req, res) => {
 
-    const token = decoded(req);
-    try{
+
+    try {
+        const token = decoded(req);
         const news = await News.find({ "_id": req.params.id });
 
         if (news == null) {
@@ -378,33 +379,33 @@ module.exports.PostManagerHiddenNews = async (req, res) => {
                 success: false,
             })
         }
-    
+
         if (news.infor.status_news == status_news.DELETE) {
             return res.json({
                 message: messageRes.NEWS_NOT_FOUND,
                 success: false,
             })
         }
-    
+
         if (news.infor.iduser == decoded.UserId) {
             return res.json({
                 message: messageRes.NEWS_NOT_FOUND,
                 success: false,
             })
         }
-    
+
         news.infor.status_news = status_news.DELETE;
         news = AuditLogSystem.SetFullInfo(token.UserId, token.UserName, news);
         await news.save();
-    
+
     }
-    catch (err){
+    catch (err) {
         return res.status(500).json({
             message: err,
             result: false
         });
     }
-   
+
 }
 
 
